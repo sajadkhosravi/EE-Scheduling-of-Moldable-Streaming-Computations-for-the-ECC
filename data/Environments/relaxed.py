@@ -8,10 +8,18 @@ env = {
             (14, 4), (15, 4), (16, 4), (11, 4), (12, 4), (13, 4),  # devices to edge 4
             (5, 0), (6, 0), (7, 0), (8, 0), (9, 0), (10, 0), (11, 0), (12, 0), (13, 0), (14, 0), (15, 0), (16, 0),
             # devices to cloud
+
             (1, 2),  # edge 1 to edge 2
+            (2, 1),  # edge 2 to edge 1
+
             (2, 3),  # edge 2 to edge 3
+            (3, 2),  # edge 3 to edge 2
+
             (3, 4),  # edge 3 to edge 4
+            (4, 3),  # edge 4 to edge 3
+
             (1, 4),  # edge 1 to edge 4
+            (4, 1),  # edge 4 to edge 1
         ],
         "bandwidth_device_to_edge": 18,
         "power_device_to_edge": 0.7,

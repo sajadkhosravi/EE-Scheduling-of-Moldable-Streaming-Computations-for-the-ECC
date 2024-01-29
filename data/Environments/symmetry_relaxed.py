@@ -7,6 +7,7 @@ env = {
             (3, 0), (4, 0), (5, 0), (6, 0), (7, 0), (8, 0),
             # devices to cloud
             (1, 2),  # edge 1 to edge 2
+            (2, 1),  # edge 1 to edge 2
         ],
         "bandwidth_device_to_edge": 18,
         "power_device_to_edge": 0.7,
