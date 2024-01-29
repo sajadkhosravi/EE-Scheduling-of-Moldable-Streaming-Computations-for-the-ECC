@@ -36,7 +36,7 @@ class SlackBasedHeuristic(Optimizer):
 
     def select_core_group(self, node, task):
         #TODO: implement selection algorithm
-        return self.num_groups - 1
+        return self.num_groups[node] - 1
 
 
     def assign(self, node, core_group, task):
