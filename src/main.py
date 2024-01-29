@@ -3,10 +3,10 @@ from optimizer.ILP.relaxedOptimizer import RelaxedOptimizer
 from optimizer.ILP.symmetryBaseOptimizer import SymmetryBaseOptimizer
 from optimizer.ILP.symmetryRelaxedOptimizer import SymmetryRelaxedOptimizer
 from optimizer.heuristic.slackBasedHeuristic import SlackBasedHeuristic
-from Data.Environments.default import env as default_env
-from Data.Environments.relaxed import env as relaxed_env
-from Data.Environments.symmetry_default import env as symmetry_base_env
-from Data.Environments.symmetry_relaxed import env as symmetry_relaxed_env
+from data.Environments.default import env as default_env
+from data.Environments.relaxed import env as relaxed_env
+from data.Environments.symmetry_default import env as symmetry_base_env
+from data.Environments.symmetry_relaxed import env as symmetry_relaxed_env
 
 import sys
 import igraph
