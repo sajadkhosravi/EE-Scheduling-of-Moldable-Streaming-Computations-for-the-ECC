@@ -1,3 +1,5 @@
+import pandas as pd
+
 from optimizer.ILP.baseOptimizer import BaseOptimizer
 from optimizer.ILP.relaxedOptimizer import RelaxedOptimizer
 from optimizer.ILP.symmetryBaseOptimizer import SymmetryBaseOptimizer
@@ -57,4 +59,12 @@ if __name__ == '__main__':
 
     print("Optimization (" + optimizer_type + ") Time: " + str(end_time - start_time))
 
+    time_dict = {"Time": [end_time - start_time]}
+    time_df = pd.DataFrame(time_dict)
+
+    time_df.to_csv(output_path + "/time.csv")
+
     optimizer.generate_result(output_path)
+
+    if optimizer_type == "SymmetryBase" or optimizer_type == "SymmetryRelaxed":
+        optimizer.data_completer(output_path)

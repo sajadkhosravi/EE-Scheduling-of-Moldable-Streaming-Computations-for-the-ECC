@@ -284,18 +284,18 @@ class Optimizer:
                 node_energies[i] = node_computational_energies[i] + nodes_idle_energies[i] + comm_node_energies[i]
 
             data = {
-                "node": range(len(node_computational_energies)),
-                "computation energy": node_computational_energies,
-                "idle energy": nodes_idle_energies,
-                "communication energy": comm_node_energies,
-                "energy": node_energies
+                "Node": range(len(node_computational_energies)),
+                "Computation": node_computational_energies,
+                "Base Power": nodes_idle_energies,
+                "Communication": comm_node_energies,
+                "Overall": node_energies
             }
             computational_energy_df = pd.DataFrame(data)
             computational_energy_df.to_csv(output_path + "/nodes_energy.csv")
 
             with open(output_path + "/consumed_energy.csv", 'w') as dcs:
-                dcs.write("Communication,Idle,Computation,Overall\n")
-                dcs.write("{},{},{},{}\n".format(total_comm_energy, total_node_energy, total_task_energy,
+                dcs.write("Base Power,Communication,Computation,Overall\n")
+                dcs.write("{},{},{},{}\n".format(total_node_energy, total_comm_energy, total_task_energy,
                                                  total_node_energy + total_task_energy + total_comm_energy))
 
             #
