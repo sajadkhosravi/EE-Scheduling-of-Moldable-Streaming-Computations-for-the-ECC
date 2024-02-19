@@ -323,8 +323,6 @@ class SlackBasedHeuristic(Optimizer):
             self.task_mapping.loc[j, "Frequency"] = selected_frequency
 
     def optimize(self):
-
-        # TODO: Calculate for multiple instances
         self.slacks_init()
         self.seeding()
         is_feasible = self.assignment()
