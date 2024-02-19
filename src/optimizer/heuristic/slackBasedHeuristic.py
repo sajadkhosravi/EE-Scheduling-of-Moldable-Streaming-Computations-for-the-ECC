@@ -194,7 +194,7 @@ class SlackBasedHeuristic(Optimizer):
                 continue
             self.channel_slack[str(predecessors_info.iloc[i]["Node"]) + "-" + str(node)] = self.channel_slack[str(
                 predecessors_info.iloc[i]["Node"]) + "-" + str(node)] + self.edge_weights[(
-            predecessors_info.iloc[i]["Task"], task)]
+                predecessors_info.iloc[i]["Task"], task)]
 
     def get_total_task_energy(self, src_nodes, dest_node, src_tasks, dest_task):
         execution_energy = self.get_task_energy(dest_node, self.cores[dest_node], FASTEST_CORE_GROUP,
@@ -299,6 +299,7 @@ class SlackBasedHeuristic(Optimizer):
 
     def tune_mapping(self):
         for j in range(len(self.task_mapping)):
+            self.task_mapping.loc[j, "node type"] = self.get_node_type(self.task_mapping.iloc[j]["Node"])
             previous_mapping = self.task_mapping.iloc[j]
             current_core_group = previous_mapping["Core Group"]
             current_frequency = previous_mapping["Frequency"]
@@ -333,8 +334,9 @@ class SlackBasedHeuristic(Optimizer):
             self.tune_mapping()
 
     def generate_result(self, output_path):
-        node_energy_consumption = pd.DataFrame(columns=["Node", "Base Power", "Communication", "Execution", "Total"])
-        overall_energy_consumption = pd.DataFrame(columns=["Base Power", "Communication", "Execution", "Total"])
+        node_energy_consumption = pd.DataFrame(columns=["Node", "Base Power", "Communication", "Computation", "Overall"])
+        overall_energy_consumption = pd.DataFrame(columns=["Base Power", "Communication", "Computation", "Overall"])
+        edge_mapping = pd.DataFrame(columns=["source node", "source node type", "target node", "target node type", "source task", "source task name", "source task type", "target task", "target task name", "target task type"])
 
         base_energy_consumption = 0
         for i in range(sum(self.nodes)):
@@ -346,15 +348,17 @@ class SlackBasedHeuristic(Optimizer):
         for i in range(len(self.task_mapping)):
             task = self.task_mapping.iloc[i]["Task"]
             task_execution_energy_consumption = self.get_task_energy(self.task_mapping.iloc[i]["Node"],
-                                                                 self.cores[self.task_mapping.iloc[i]["Node"]],
-                                                                 self.task_mapping.iloc[i]["Core Group"],
-                                                                 self.workloads[task],
-                                                                 self.max_widths[task],
-                                                                 self.task_types[task],
-                                                                 self.task_mapping.iloc[i]["Frequency"])
+                                                                     self.cores[self.task_mapping.iloc[i]["Node"]],
+                                                                     self.task_mapping.iloc[i]["Core Group"],
+                                                                     self.workloads[task],
+                                                                     self.max_widths[task],
+                                                                     self.task_types[task],
+                                                                     self.task_mapping.iloc[i]["Frequency"])
 
-            node_energy_consumption.loc[node_energy_consumption["Node"] == self.task_mapping.iloc[i]["Node"], "Execution"] += task_execution_energy_consumption
-            node_energy_consumption.loc[node_energy_consumption["Node"] == self.task_mapping.iloc[i]["Node"], "Total"] += task_execution_energy_consumption
+            node_energy_consumption.loc[node_energy_consumption["Node"] == self.task_mapping.iloc[i][
+                "Node"], "Computation"] += task_execution_energy_consumption
+            node_energy_consumption.loc[node_energy_consumption["Node"] == self.task_mapping.iloc[i][
+                "Node"], "Overall"] += task_execution_energy_consumption
             execution_energy_consumption += task_execution_energy_consumption
 
         communication_energy_consumption = 0
@@ -363,22 +367,34 @@ class SlackBasedHeuristic(Optimizer):
             src_node = self.task_mapping.loc[self.task_mapping["Task"] == r].iloc[0]["Node"]
             dest_node = self.task_mapping.loc[self.task_mapping["Task"] == s].iloc[0]["Node"]
 
+            edge_mapping.loc[len(edge_mapping)] = [src_node, self.get_node_type(src_node),
+                                                   dest_node, self.get_node_type(dest_node),
+                                                   r, self.task_names[r], self.task_types[r],
+                                                   s, self.task_names[s], self.task_types[s]]
+
             if src_node != dest_node:
-                task_communication_energy_consumption = self.get_comm_energy(src_node, dest_node, self.edge_weights[(r, s)])
+                task_communication_energy_consumption = self.get_comm_energy(src_node, dest_node,
+                                                                             self.edge_weights[(r, s)])
 
                 node_energy_consumption.loc[src_node, "Communication"] += task_communication_energy_consumption / 2
-                node_energy_consumption.loc[src_node, "Total"] += task_communication_energy_consumption / 2
+                node_energy_consumption.loc[src_node, "Overall"] += task_communication_energy_consumption / 2
 
                 node_energy_consumption.loc[dest_node, "Communication"] += task_communication_energy_consumption / 2
-                node_energy_consumption.loc[dest_node, "Total"] += task_communication_energy_consumption / 2
+                node_energy_consumption.loc[dest_node, "Overall"] += task_communication_energy_consumption / 2
 
                 communication_energy_consumption += task_communication_energy_consumption
 
         total_energy_consumption = base_energy_consumption + execution_energy_consumption + communication_energy_consumption
 
-        overall_energy_consumption.loc[0] = [base_energy_consumption, communication_energy_consumption, execution_energy_consumption, total_energy_consumption]
+        overall_energy_consumption.loc[0] = [base_energy_consumption, communication_energy_consumption,
+                                             execution_energy_consumption, total_energy_consumption]
         print(total_energy_consumption)
+
+        active_nodes_dict = {"solution_value": self.active_nodes}
+        active_nodes_df = pd.DataFrame(active_nodes_dict)
 
         self.task_mapping.to_csv(output_path + "/tasks_allocation.csv")
         node_energy_consumption.to_csv(output_path + "/nodes_energy.csv")
-        overall_energy_consumption.to_csv(output_path + "/energy.csv")
+        overall_energy_consumption.to_csv(output_path + "/consumed_energy.csv")
+        active_nodes_df.to_csv(output_path + "/active_nodes.csv")
+        edge_mapping.to_csv(output_path + "/edge_mapping.csv")
