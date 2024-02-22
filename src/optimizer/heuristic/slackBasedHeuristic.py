@@ -206,8 +206,8 @@ class SlackBasedHeuristic(Optimizer):
             comm_energy += self.get_comm_energy(src_nodes[i], dest_node, self.edge_weights[(src_tasks[i], dest_task)])
 
         total_energy = execution_energy + comm_energy
-        if self.active_nodes[dest_node] == 0:
-            total_energy += self.get_base_power(dest_node) * self.deadline
+        # if self.active_nodes[dest_node] == 0:
+        #     total_energy += self.get_base_power(dest_node) * self.deadline
 
         return total_energy
 
@@ -217,7 +217,26 @@ class SlackBasedHeuristic(Optimizer):
             for node in available_nodes[i]:
                 candidates[node] = self.get_total_task_energy(src_nodes, node, src_tasks, dest_task)
 
-        return [t[0] for t in sorted(candidates.items())]
+        return sorted(candidates, key=lambda x: candidates[x])
+
+    def get_sorted_mapping_candidate_by_energy_and_workload(self, available_nodes, src_nodes, src_tasks, dest_task):
+        candidates = {}
+        max_energy = 0
+        max_workload = 0
+        for i in range(len(available_nodes)):
+            for node in available_nodes[i]:
+                candidates[node] = {"energy": self.get_total_task_energy(src_nodes, node, src_tasks, dest_task),
+                                    "available_workload": self.workload_slack[node][0]}
+                if candidates[node]["energy"] > max_energy:
+                    max_energy = candidates[node]["energy"]
+                if candidates[node]["available_workload"] > max_workload:
+                    max_workload = candidates[node]["available_workload"]
+
+        for i in range(len(available_nodes)):
+            for node in available_nodes[i]:
+                candidates[node] = candidates[node]["energy"] / max_energy - candidates[node][
+                    "available_workload"] / max_workload
+        return sorted(candidates, key=lambda x: candidates[x])
 
     def slacks_init(self):
         # Initialize channel slack vector
@@ -270,8 +289,9 @@ class SlackBasedHeuristic(Optimizer):
                 mapped_nodes = predecessors_mapping_info["Node"].tolist()
                 mapped_tasks = predecessors_mapping_info["Task"].tolist()
                 mapping_candidate_nodes = self.get_connected_nodes(mapped_nodes)
-                mapping_candidate_nodes = self.get_sorted_mapping_candidate(mapping_candidate_nodes, mapped_nodes,
-                                                                            mapped_tasks, current_task)
+                # mapping_candidate_nodes = self.get_sorted_mapping_candidate(mapping_candidate_nodes, mapped_nodes, mapped_tasks, current_task)
+                mapping_candidate_nodes = self.get_sorted_mapping_candidate_by_energy_and_workload(
+                    mapping_candidate_nodes, mapped_nodes, mapped_tasks, current_task)
                 is_assigned = False
                 previous_mapping = self.task_mapping.loc[self.task_mapping["Task"] == current_task].iloc[0]
                 for node in mapping_candidate_nodes:
@@ -297,6 +317,16 @@ class SlackBasedHeuristic(Optimizer):
 
         return True
 
+    def get_required_energy_on_different_groups_and_frequencies(self, node, task):
+        required_energy = {}
+        for i in range(1, self.num_groups[node] + 1):
+            for k in range(self.num_freqs[node]):
+                required_energy[str(i) + "-" + str(k)] = self.get_task_energy(node, self.cores[node], i,
+                                                                              self.workloads[task],
+                                                                              self.max_widths[task],
+                                                                              self.task_types[task], k)
+        return sorted(required_energy, key=lambda x: required_energy[x])
+
     def tune_mapping(self):
         for j in range(len(self.task_mapping)):
             self.task_mapping.loc[j, "node type"] = self.get_node_type(self.task_mapping.iloc[j]["Node"])
@@ -305,23 +335,38 @@ class SlackBasedHeuristic(Optimizer):
             current_frequency = previous_mapping["Frequency"]
             selected_core_group = -1
             selected_frequency = -2
-            is_tuned = False
-            for core_group in range(self.num_groups[previous_mapping["Node"]], 0, -1):
-                if not is_tuned:
-                    self.unassign(previous_mapping["Node"], current_core_group, previous_mapping["Task"],
-                                  pd.DataFrame(), current_frequency)
-                    for k in range(self.num_freqs[previous_mapping["Node"]]):
-                        if self.assign(previous_mapping["Node"], core_group, previous_mapping["Task"], pd.DataFrame(),
-                                       k):
-                            selected_core_group = core_group
-                            selected_frequency = k
-                            is_tuned = True
-                            break
-                else:
+
+            sorted_group_frequency_list = self.get_required_energy_on_different_groups_and_frequencies(
+                previous_mapping["Node"], previous_mapping["Task"])
+
+            self.unassign(previous_mapping["Node"], current_core_group, previous_mapping["Task"], pd.DataFrame(),
+                          current_frequency)
+            for ik in sorted_group_frequency_list:
+                ik_arr = ik.split("-")
+                if self.assign(previous_mapping["Node"], int(ik_arr[0]), previous_mapping["Task"], pd.DataFrame(),
+                               int(ik_arr[1])):
+                    selected_core_group = int(ik_arr[0])
+                    selected_frequency = int(ik_arr[1])
                     break
+
+        # is_tuned = False
+        # for core_group in range(self.num_groups[previous_mapping["Node"]], 0, -1):
+        #     if not is_tuned:
+        #         self.unassign(previous_mapping["Node"], current_core_group, previous_mapping["Task"],
+        #                       pd.DataFrame(), current_frequency)
+        #         for k in range(self.num_freqs[previous_mapping["Node"]]):
+        #             if self.assign(previous_mapping["Node"], core_group, previous_mapping["Task"], pd.DataFrame(),
+        #                            k):
+        #                 selected_core_group = core_group
+        #                 selected_frequency = k
+        #                 is_tuned = True
+        #                 break
+        #     else:
+        #         break
 
             self.task_mapping.loc[j, "Core Group"] = selected_core_group
             self.task_mapping.loc[j, "Frequency"] = selected_frequency
+
 
     def optimize(self):
         self.slacks_init()
