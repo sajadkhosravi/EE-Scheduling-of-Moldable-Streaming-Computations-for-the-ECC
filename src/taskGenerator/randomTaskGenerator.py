@@ -8,7 +8,8 @@ import os
 # Task workload is integer in [1,MAX_WORKLOAD]
 MAX_WORKLOAD = 100
 # Task types according to epEBench benchmark, cf. https://doi.org/10.1109/PDP.2017.21 and https://github.com/RobertMueller/epEBench.
-TASKTYPES = ['MEMORY', 'BRANCH', 'FMULT', 'SIMD', 'MATMUL']
+# TASKTYPES = ['MEMORY', 'BRANCH', 'FMULT', 'SIMD', 'MATMUL']
+TASKTYPES = ['MEMORY', 'FMULT', 'SIMD']
 # PRNG seed value
 RANDSEED = 2502
 
