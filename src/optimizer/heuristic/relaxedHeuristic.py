@@ -92,7 +92,7 @@ class RelaxedHeuristic(Heuristic):
             bandwidth = self.bandwidth_edge_to_edge
             power = self.power_edge_to_edge
         else:
-            raise ValueError("Implausible node pair discovered in bandwidth request.")
+            return float('inf')
         comm_duration = data_amount / (bandwidth / 8)
         # Communication energy is in J
         return comm_duration * power
