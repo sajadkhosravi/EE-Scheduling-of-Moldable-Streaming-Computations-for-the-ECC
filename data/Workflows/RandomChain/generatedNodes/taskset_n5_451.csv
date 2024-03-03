@@ -1,0 +1,6 @@
+id,workload,max_width,tasktype
+0,21,1,FMULT
+1,80,2,SIMD
+2,82,4,SIMD
+3,60,4,MEMORY
+4,42,4,MEMORY

@@ -36,6 +36,9 @@ class Heuristic(Optimizer):
         common_nodes = set.intersection(*connected_nodes_dict.values()) if connected_nodes_dict else set()
 
         common_nodes_arr = list(common_nodes)
+        for u in predecessor_nodes:
+            if u not in common_nodes_arr:
+                common_nodes_arr.append(u)
         for node in common_nodes_arr:
             connected_nodes[self.get_node_type(node)].append(node)
 
@@ -201,7 +204,13 @@ class Heuristic(Optimizer):
                 max_workload = candidates[node]["available_workload"]
 
         for node in available_nodes:
-            candidates[node] = candidates[node]["energy"] / max_energy - candidates[node]["available_workload"] / max_workload
+            energy = 0
+            available_workload = 0
+            if max_energy > 0:
+                energy = candidates[node]["energy"] / max_energy
+            if max_workload > 0:
+                candidates[node]["available_workload"] / max_workload
+            candidates[node] = energy - max_workload
         return sorted(candidates, key=lambda x: candidates[x])
 
     def slacks_init(self):

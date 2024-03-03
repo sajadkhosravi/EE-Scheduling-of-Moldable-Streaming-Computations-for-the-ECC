@@ -6,9 +6,10 @@ from optimizer.ILP.symmetryBaseOptimizer import SymmetryBaseOptimizer
 from optimizer.ILP.symmetryRelaxedOptimizer import SymmetryRelaxedOptimizer
 from optimizer.heuristic.baseHeuristic import Heuristic
 from optimizer.heuristic.relaxedHeuristic import RelaxedHeuristic
-from data.Environments.default import env as default_env
-from data.Environments.default_small import env as default_small_env
-from data.Environments.relaxed import env as relaxed_env
+from data.Environments.default import env as default_base_env
+from data.Environments.default_small import env as default_base_small_env
+from data.Environments.relaxed_small import env as default_relaxed_small_env
+from data.Environments.relaxed import env as default_relaxed_env
 from data.Environments.symmetry_default import env as symmetry_base_env
 from data.Environments.symmetry_relaxed import env as symmetry_relaxed_env
 
@@ -26,9 +27,12 @@ if __name__ == '__main__':
     input_filename = sys.argv[3]
     output_path = sys.argv[4]
 
-    base_env = default_env
+    base_env = default_base_env
+    relaxed_env = default_relaxed_env
+
     if env_size == "small":
-        base_env = default_small_env
+        base_env = default_base_small_env
+        relaxed_env = default_relaxed_small_env
 
     task_graph = igraph.load(input_filename)
 
@@ -54,7 +58,7 @@ if __name__ == '__main__':
                                              base_env["execution_time_multipliers"],
                                              base_env["power"])
     elif optimizer_type == "RelaxedHeuristic":
-        optimizer = Heuristic(task_graph, relaxed_env["compute_resources"], relaxed_env["network"], relaxed_env["execution_time_multipliers"], relaxed_env["power"])
+        optimizer = RelaxedHeuristic(task_graph, relaxed_env["compute_resources"], relaxed_env["network"], relaxed_env["execution_time_multipliers"], relaxed_env["power"])
 
     else:
         # optimizer = BaseOptimizer(task_graph, default_env["compute_resources"], default_env["network"], default_env["execution_time_multipliers"], default_env["power"])

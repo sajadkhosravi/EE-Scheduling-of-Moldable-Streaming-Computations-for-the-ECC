@@ -7,10 +7,17 @@ env = {
             (11, 3), (12, 3), (13, 3), (14, 3), (15, 3), (16, 3),  # devices to edge 3
             (14, 4), (15, 4), (16, 4), (11, 4), (12, 4), (13, 4),  # devices to edge 4
         ],
-        "bandwidth_device_to_edge": 18,
-        "power_device_to_edge": 0.7,
-        "bandwidth_edge_to_cloud": 100,
-        "power_edge_to_cloud": 0.3
+        "bandwidth_device_to_edge": 191,
+        # Consider linear relation between bandwidth and power
+        "power_device_to_edge": 7.43,
+        "bandwidth_edge_to_cloud": 1000,
+        "power_edge_to_cloud": 3.0,
+
+
+        "upload_bandwidth_device": 191,
+        "download_bandwidth_edge_device": 191,
+        "upload_bandwidth_edge_cloud": 1000,
+        "download_bandwidth_cloud": 1000,
     },
 
     "power": {

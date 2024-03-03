@@ -222,17 +222,17 @@ class RelaxedOptimizer(Optimizer):
                     name="constraint_download_bandwidth_edge_{0}_from_edge".format(u)
                 )
                 self.opt_model.addConstr(
-                    lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r, s)] for r, s in self.edges for v in self.set_U if self.get_node_type(v) == 1 and v != u and (u, v) in self.network_links),
+                    lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r, s)] for r, s in self.edges for v in self.set_U if self.get_node_type(v) >= 1 and v != u and (u, v) in self.network_links),
                     sense=grb.GRB.LESS_EQUAL,
                     rhs=self.get_node_upload_links_volume(u, 1),
-                    name="constraint_upload_bandwidth_edge_{0}_to_edge".format(u)
+                    name="constraint_upload_bandwidth_edge_{0}".format(u)
                 )
-                self.opt_model.addConstr(
-                    lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r, s)] for r, s in self.edges for v in self.set_U if self.get_node_type(v) == 2 and (u, v) in self.network_links),
-                    sense=grb.GRB.LESS_EQUAL,
-                    rhs=self.get_node_upload_links_volume(u, 2),
-                    name="constraint_upload_bandwidth_edge_{0}_to_cloud".format(u)
-                )
+                # self.opt_model.addConstr(
+                #     lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r, s)] for r, s in self.edges for v in self.set_U if self.get_node_type(v) == 2 and (u, v) in self.network_links),
+                #     sense=grb.GRB.LESS_EQUAL,
+                #     rhs=self.get_node_upload_links_volume(u, 2),
+                #     name="constraint_upload_bandwidth_edge_{0}_to_cloud".format(u)
+                # )
 
         # Constraint: no backwards data flow
         for u in self.set_U:

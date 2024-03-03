@@ -33,7 +33,7 @@ def node_detail(data, label, type, color):
                 bbox_inches='tight')
 
 
-def overall_result(data, labels, colors):
+def overall_result(data, labels, colors, output_file_name):
     methods = np.arange(0, len(data))
     plt.figure(figsize=(10, 6))
     bars = plt.bar(methods, data, width=0.4, align='center', alpha=0.7, color=colors)
@@ -45,13 +45,13 @@ def overall_result(data, labels, colors):
     plt.xticks(range(len(data)), x_labels)
     # plt.xlabel('Methods')
     plt.ylabel('Overall Energy')
-    plt.savefig(OUTPUT_PATH + '/charts/overall_node_energy_comparison_4_instances.svg', format="svg",
+    plt.savefig(OUTPUT_PATH + '/charts/'+ output_file_name +'_overall_node_energy_comparison_4_instances.svg', format="svg",
                 bbox_inches='tight')
-    plt.savefig(OUTPUT_PATH + '/charts/overall_node_energy_comparison_4_instances.png', format="png",
+    plt.savefig(OUTPUT_PATH + '/charts/'+ output_file_name +'_overall_node_energy_comparison_4_instances.png', format="png",
                 bbox_inches='tight')
 
 
-def time_plot(data, labels, colors):
+def time_plot(data, labels, colors, output_file_name):
     methods = np.arange(0, len(data))
     plt.figure(figsize=(10, 6))
     bars = plt.bar(methods, data, width=0.4, align='center', alpha=0.7, color=colors)
@@ -63,8 +63,8 @@ def time_plot(data, labels, colors):
     plt.xticks(range(len(data)), x_labels)
     # plt.xlabel('Methods')
     plt.ylabel('Optimization Time')
-    plt.savefig(OUTPUT_PATH + '/charts/time_comparison_4_instances.svg', format="svg", bbox_inches='tight')
-    plt.savefig(OUTPUT_PATH + '/charts/time_comparison_4_instances.png', format="png", bbox_inches='tight')
+    plt.savefig(OUTPUT_PATH + '/charts/'+ output_file_name +'_time_comparison_4_instances.svg', format="svg", bbox_inches='tight')
+    plt.savefig(OUTPUT_PATH + '/charts/'+ output_file_name +'_time_comparison_4_instances.png', format="png", bbox_inches='tight')
 
 
 if __name__ == '__main__':
@@ -81,11 +81,11 @@ if __name__ == '__main__':
     node_symmetry_relaxed = pd.read_csv(OUTPUT_PATH + '\\SymmetryRelaxed\\T4\\nodes_energy.csv')
     node_heuristic = pd.read_csv(OUTPUT_PATH + '\\SlackHeuristic\\T4\\nodes_energy.csv')
 
-    node_detail(node_base, 'Base', 'Overall', 'blue')
-    node_detail(node_relaxed, 'Relaxed', 'Overall', 'green')
-    node_detail(node_symmetry_base, 'Symmetry-Base', 'Overall', 'lightseagreen')
-    node_detail(node_symmetry_relaxed, 'Symmetry-Relaxed', 'Overall', 'springgreen')
-    node_detail(node_heuristic, 'Heuristic', 'Overall', 'purple')
+    # node_detail(node_base, 'Base', 'Overall', 'blue')
+    # node_detail(node_relaxed, 'Relaxed', 'Overall', 'green')
+    # node_detail(node_symmetry_base, 'Symmetry-Base', 'Overall', 'lightseagreen')
+    # node_detail(node_symmetry_relaxed, 'Symmetry-Relaxed', 'Overall', 'springgreen')
+    # node_detail(node_heuristic, 'Heuristic', 'Overall', 'purple')
 
     # Overall Energy
     overall_base = pd.read_csv(OUTPUT_PATH + '\\Base\\T4\\consumed_energy.csv')
@@ -94,6 +94,10 @@ if __name__ == '__main__':
     overall_symmetry_relaxed = pd.read_csv(OUTPUT_PATH + '\\SymmetryRelaxed\\T4\\consumed_energy.csv')
     overall_heuristic = pd.read_csv(OUTPUT_PATH + '\\SlackHeuristic\\T4\\consumed_energy.csv')
 
+    overall_random_base = pd.read_csv(OUTPUT_PATH + '\\Base\\Random\\consumed_energy.csv')
+    overall_random_relaxed = pd.read_csv(OUTPUT_PATH + '\\Relaxed\\Random\\consumed_energy.csv')
+    overall_random_heuristic = pd.read_csv(OUTPUT_PATH + '\\SlackHeuristic\\Random\\consumed_energy.csv')
+
     overall_energy_consumptions = [
         overall_base.iloc[0]["Overall"],
         overall_symmetry_base.iloc[0]["Overall"],
@@ -101,9 +105,19 @@ if __name__ == '__main__':
         overall_symmetry_relaxed.iloc[0]["Overall"],
         overall_heuristic.iloc[0]["Overall"],
     ]
-    overall_result(overall_energy_consumptions,
-                   ["Base", "Symmetry-Base", "Relaxed", "Symmetry-Relaxed", "Heuristic"],
-                   ["blue", "lightseagreen", "green", "springgreen", "purple"])
+
+    # overall_result(overall_energy_consumptions,
+    #                ["Base", "Symmetry-Base", "Relaxed", "Symmetry-Relaxed", "Heuristic"],
+    #                ["blue", "lightseagreen", "green", "springgreen", "purple"], "")
+
+    overall_random_energy_consumptions = [
+        overall_random_base.iloc[0]["Overall"],
+        overall_random_relaxed.iloc[0]["Overall"],
+        overall_random_heuristic.iloc[0]["Overall"],
+    ]
+    overall_result(overall_random_energy_consumptions,
+                   ["Base", "Relaxed", "Heuristic"],
+                   ["blue", "green", "purple"], "random")
 
     # Optimization Time
     time_base = pd.read_csv(OUTPUT_PATH + '\\Base\\T4\\time.csv')
@@ -112,6 +126,11 @@ if __name__ == '__main__':
     time_symmetry_relaxed = pd.read_csv(OUTPUT_PATH + '\\SymmetryRelaxed\\T4\\time.csv')
     time_heuristic = pd.read_csv(OUTPUT_PATH + '\\SlackHeuristic\\T4\\time.csv')
 
+    time_random_base = pd.read_csv(OUTPUT_PATH + '\\Base\\Random\\time.csv')
+    time_random_relaxed = pd.read_csv(OUTPUT_PATH + '\\Relaxed\\Random\\time.csv')
+    time_random_heuristic = pd.read_csv(OUTPUT_PATH + '\\SlackHeuristic\\Random\\time.csv')
+
+
     times = [
         time_base.iloc[0]["Time"],
         time_symmetry_base.iloc[0]["Time"],
@@ -119,6 +138,16 @@ if __name__ == '__main__':
         time_symmetry_relaxed.iloc[0]["Time"],
         time_heuristic.iloc[0]["Time"],
     ]
-    time_plot(times,
-              ["Base", "Symmetry-Base", "Relaxed", "Symmetry-Relaxed", "Heuristic"],
-              ["blue", "lightseagreen", "green", "springgreen", "purple"])
+    # time_plot(times,
+    #           ["Base", "Symmetry-Base", "Relaxed", "Symmetry-Relaxed", "Heuristic"],
+    #           ["blue", "lightseagreen", "green", "springgreen", "purple"], "")
+
+    random_times = [
+        time_random_base.iloc[0]["Time"],
+        time_random_relaxed.iloc[0]["Time"],
+        time_random_heuristic.iloc[0]["Time"],
+    ]
+
+    time_plot(random_times,
+              ["Base", "Relaxed", "Heuristic"],
+              ["blue", "green", "purple"], "random")

@@ -96,3 +96,43 @@ class RelaxedHeuristic(Heuristic):
         comm_duration = data_amount / (bandwidth / 8)
         # Communication energy is in J
         return comm_duration * power
+
+    def is_assignable(self, node, core_group, task, predecessors_info, required_time, upload_channel_slack,
+                      download_channel_slack, workload_slack):
+        workload_assignment_status = True
+        channel_assignment_status = True
+
+        for i in range(len(predecessors_info)):
+            if node == predecessors_info.iloc[i]["Node"]:
+                continue
+            remained_upload_channel_volume = [0.0, 0.0]
+            if self.get_node_type(predecessors_info.iloc[i]["Node"]) == 1:
+                remained_upload_channel_volume[1] = upload_channel_slack[predecessors_info.iloc[i]["Node"]][2] - self.edge_weights[(predecessors_info.iloc[i]["Task"], task)]
+                remained_upload_channel_volume[0] = upload_channel_slack[predecessors_info.iloc[i]["Node"]][1] - self.edge_weights[(predecessors_info.iloc[i]["Task"], task)]
+            else:
+                remained_upload_channel_volume[0] = upload_channel_slack[predecessors_info.iloc[i]["Node"]][self.get_node_type(node)] - self.edge_weights[(predecessors_info.iloc[i]["Task"], task)]
+
+            remained_download_channel_volume = download_channel_slack[node][self.get_node_type(predecessors_info.iloc[i]["Node"])] - self.edge_weights[(predecessors_info.iloc[i]["Task"], task)]
+
+            if (remained_upload_channel_volume[0] < 0 and remained_upload_channel_volume[1] < 0) or remained_download_channel_volume < 0:
+                channel_assignment_status = False
+                break
+            if self.get_node_type(predecessors_info.iloc[i]["Node"]) == 1:
+                upload_channel_slack[predecessors_info.iloc[i]["Node"]][1] = remained_upload_channel_volume[0]
+                upload_channel_slack[predecessors_info.iloc[i]["Node"]][2] = remained_upload_channel_volume[1]
+            else:
+                upload_channel_slack[predecessors_info.iloc[i]["Node"]][self.get_node_type(node)] = remained_upload_channel_volume[0]
+            download_channel_slack[node][self.get_node_type(predecessors_info.iloc[i]["Node"])] = remained_download_channel_volume
+
+        core_groups = [core_group]
+        core_groups = core_groups + self.get_parent_core_groups(core_group)
+        core_groups = core_groups + self.get_child_core_groups(core_group, self.num_groups[node])
+
+        for i in core_groups:
+            if workload_slack[i - 1] - required_time < 0:
+                workload_assignment_status = False
+                break
+            else:
+                workload_slack[i - 1] = workload_slack[i - 1] - required_time
+
+        return workload_assignment_status, channel_assignment_status
