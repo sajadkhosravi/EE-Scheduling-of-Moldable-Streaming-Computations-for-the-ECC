@@ -3,72 +3,24 @@ from queue import Queue
 
 import pandas as pd
 
-# Create a vector slack for each node
-# Create a vector slack for each communication link
-# Assign function
-# Seeding phase
-# Rescaling phase
-
-
 CLOUD_ID = 0
-FASTEST_CORE_GROUP = 1
 
 
-class SlackBasedHeuristic(Optimizer):
+class Heuristic(Optimizer):
     def __init__(self, task_graph, compute_resource, network_info, execution_time_multipliers, power_info):
         super().__init__(task_graph, compute_resource, network_info, execution_time_multipliers, power_info)
-        self.bandwidth_edge_to_edge = network_info["bandwidth_edge_to_edge"]
-        self.power_edge_to_edge = network_info["power_edge_to_edge"]
-        self.bandwidth_device_to_cloud = network_info["bandwidth_device_to_cloud"]
-        self.power_device_to_cloud = network_info["power_device_to_cloud"]
         self.workload_slack = []
-        self.channel_slack = {}
+        self.upload_channel_slack = []
+        self.download_channel_slack = []
         self.active_nodes = [0] * sum(self.nodes)
         self.active_nodes[CLOUD_ID] = 1
         self.task_mapping = pd.DataFrame(columns=["Task", "Node", "Core Group", "Frequency", "IsMapped", "Instance"])
 
-    def get_link_volume(self, orig_node, dest_node, deadline):
-        if orig_node == dest_node:
-            return float('inf')
-        if not (orig_node, dest_node) in self.network_links:
-            return 0
-        # Link exists, determine type of nodes
-        if self.get_node_type(orig_node) == 0 and self.get_node_type(dest_node) == 1:
-            # Volume depends on bandwidth and round length
-            # Bandwidth is in MBit/s, deadline in s, volume in MB
-            return (self.bandwidth_device_to_edge / 8) * deadline
-        if self.get_node_type(orig_node) == 1 and self.get_node_type(dest_node) == 2:
-            return (self.bandwidth_edge_to_cloud / 8) * deadline
-        if self.get_node_type(orig_node) == 0 and self.get_node_type(dest_node) == 2:
-            return (self.bandwidth_device_to_edge / 8) * deadline
-        if self.get_node_type(orig_node) == 1 and self.get_node_type(dest_node) == 2:
-            return (self.bandwidth_device_to_cloud / 8) * deadline
-        if self.get_node_type(orig_node) == 1 and self.get_node_type(dest_node) == 1:
-            return (self.bandwidth_edge_to_edge / 8) * deadline
-        raise ValueError("Implausible node pair discovered in bandwidth request.")
+    def get_node_available_upload_links_volume(self, node, dest_type):
+        return self.upload_channel_slack[node][dest_type]
 
-    def get_comm_energy(self, orig_node, dest_node, data_amount):
-        # data to transfer is given in MB
-        # Bandwidth is in MBit/s, power in W
-        if orig_node == dest_node:
-            return 0.0
-        elif self.get_node_type(orig_node) == 0 and self.get_node_type(dest_node) == 1:
-            bandwidth = self.bandwidth_device_to_edge
-            power = self.power_device_to_edge
-        elif self.get_node_type(orig_node) == 1 and self.get_node_type(dest_node) == 2:
-            bandwidth = self.bandwidth_edge_to_cloud
-            power = self.power_edge_to_cloud
-        elif self.get_node_type(orig_node) == 0 and self.get_node_type(dest_node) == 2:
-            bandwidth = self.bandwidth_device_to_cloud
-            power = self.bandwidth_device_to_cloud
-        elif self.get_node_type(orig_node) == 1 and self.get_node_type(dest_node) == 1:
-            bandwidth = self.bandwidth_edge_to_edge
-            power = self.power_edge_to_edge
-        else:
-            raise ValueError("Implausible node pair discovered in bandwidth request.")
-        comm_duration = data_amount / (bandwidth / 8)
-        # Communication energy is in J
-        return comm_duration * power
+    def get_node_available_download_links_volume(self, node, src_type):
+        return self.download_channel_slack[node][src_type]
 
     def get_connected_nodes(self, predecessor_nodes):
         connected_nodes = [[], [], []]
@@ -134,26 +86,43 @@ class SlackBasedHeuristic(Optimizer):
         predecessors = self.get_predecessor_tasks(task)
         return self.task_mapping.loc[self.task_mapping["Task"].isin(predecessors)]
 
-    def is_ready_to_map(self, predecessors_mapping_info):
-        for row in predecessors_mapping_info["IsMapped"]:
-            if not row:
-                return False
-        return True
+    def is_ready_to_map(self, task, predecessors_mapping_info):
+        predecessors = self.get_predecessor_tasks(task)
+        return len(predecessors) == len(predecessors_mapping_info)
 
     def is_mapped(self, task):
         mapping_info = self.task_mapping[self.task_mapping["Task"] == task]
-        return mapping_info.iloc[0]["IsMapped"]
+        return len(mapping_info) > 0 and mapping_info.iloc[0]["IsMapped"]
 
-    def is_assignable(self, node, core_group, task, predecessors_info, required_time, channel_slack, workload_slack):
+    def get_core_groups_sorted(self, node, max_width):
+        needed_cores = max_width
+        core_groups = self.get_groups_with_specific_width(needed_cores, self.cores[node])
+        while len(core_groups) == 0:
+            needed_cores /= 2
+            core_groups = self.get_groups_with_specific_width(needed_cores, self.cores[node])
+        data = {}
+        for group in core_groups:
+            data[group] = self.workload_slack[node][group - 1]
+        return sorted(data, key=lambda x: data[x], reverse=True)
+
+    def is_assignable(self, node, core_group, task, predecessors_info, required_time, upload_channel_slack,
+                      download_channel_slack, workload_slack):
+        workload_assignment_status = True
+        channel_assignment_status = True
+
         for i in range(len(predecessors_info)):
             if node == predecessors_info.iloc[i]["Node"]:
                 continue
-            remained_channel_volume = channel_slack[str(predecessors_info.iloc[i]["Node"]) + "-" + str(node)] - \
-                                      self.edge_weights[
-                                          (predecessors_info.iloc[i]["Task"], task)]
-            if remained_channel_volume < 0:
-                return False
-            channel_slack[str(predecessors_info.iloc[i]["Node"]) + "-" + str(node)] = remained_channel_volume
+            remained_upload_channel_volume = upload_channel_slack[predecessors_info.iloc[i]["Node"]][self.get_node_type(node)] - \
+                                             self.edge_weights[(predecessors_info.iloc[i]["Task"], task)]
+            remained_download_channel_volume = download_channel_slack[node][self.get_node_type(predecessors_info.iloc[i]["Node"])] - self.edge_weights[
+                (predecessors_info.iloc[i]["Task"], task)]
+
+            if remained_upload_channel_volume < 0 or remained_download_channel_volume < 0:
+                channel_assignment_status = False
+                break
+            upload_channel_slack[predecessors_info.iloc[i]["Node"]][self.get_node_type(node)] = remained_upload_channel_volume
+            download_channel_slack[node][self.get_node_type(predecessors_info.iloc[i]["Node"])] = remained_download_channel_volume
 
         core_groups = [core_group]
         core_groups = core_groups + self.get_parent_core_groups(core_group)
@@ -161,43 +130,45 @@ class SlackBasedHeuristic(Optimizer):
 
         for i in core_groups:
             if workload_slack[i - 1] - required_time < 0:
-                return False
+                workload_assignment_status = False
+                break
             else:
                 workload_slack[i - 1] = workload_slack[i - 1] - required_time
 
-        return True
+        return workload_assignment_status, channel_assignment_status
 
     def assign(self, node, core_group, task, predecessors_info, frequency_level):
-        temp_channel_slack = self.channel_slack.copy()
+        temp_upload_channel_slack = self.upload_channel_slack.copy()
+        temp_download_channel_slack = self.download_channel_slack.copy()
         temp_workload_slack = self.workload_slack[node].copy()
+
         required_time = self.get_task_runtime(node, self.cores[node], core_group, self.workloads[task],
                                               self.max_widths[task], self.task_types[task], frequency_level)
-        if self.is_assignable(node, core_group, task, predecessors_info, required_time, temp_channel_slack,
-                              temp_workload_slack):
+
+        workload_status, channel_status = self.is_assignable(node, core_group, task, predecessors_info, required_time,
+                                                             temp_upload_channel_slack, temp_download_channel_slack,
+                                                             temp_workload_slack)
+        if workload_status and channel_status:
             self.workload_slack[node] = temp_workload_slack
-            self.channel_slack[node] = temp_channel_slack
+            self.upload_channel_slack = temp_upload_channel_slack
+            self.download_channel_slack = temp_download_channel_slack
             return True
 
         return False
 
-    def unassign(self, node, core_group, task, predecessors_info, frequency_level):
+    def unassign(self, node, core_group, task, frequency_level):
         required_time = self.get_task_runtime(node, self.cores[node], core_group, self.workloads[task],
                                               self.max_widths[task], self.task_types[task], frequency_level)
+
         core_groups = [core_group]
         core_groups = core_groups + self.get_parent_core_groups(core_group)
         core_groups = core_groups + self.get_child_core_groups(core_group, self.num_groups[node])
         for i in core_groups:
             self.workload_slack[node][i - 1] = self.workload_slack[node][i - 1] + required_time
 
-        for i in range(len(predecessors_info)):
-            if node == predecessors_info.iloc[i]["Node"]:
-                continue
-            self.channel_slack[str(predecessors_info.iloc[i]["Node"]) + "-" + str(node)] = self.channel_slack[str(
-                predecessors_info.iloc[i]["Node"]) + "-" + str(node)] + self.edge_weights[(
-                predecessors_info.iloc[i]["Task"], task)]
-
     def get_total_task_energy(self, src_nodes, dest_node, src_tasks, dest_task):
-        execution_energy = self.get_task_energy(dest_node, self.cores[dest_node], FASTEST_CORE_GROUP,
+        core_groups = self.get_core_groups_sorted(dest_node, self.max_widths[dest_task])
+        execution_energy = self.get_task_energy(dest_node, self.cores[dest_node], core_groups[0],
                                                 self.workloads[dest_task], self.max_widths[dest_task],
                                                 self.task_types[dest_task], -1)
 
@@ -206,16 +177,15 @@ class SlackBasedHeuristic(Optimizer):
             comm_energy += self.get_comm_energy(src_nodes[i], dest_node, self.edge_weights[(src_tasks[i], dest_task)])
 
         total_energy = execution_energy + comm_energy
-        # if self.active_nodes[dest_node] == 0:
-        #     total_energy += self.get_base_power(dest_node) * self.deadline
+        if self.active_nodes[dest_node] == 0:
+            total_energy += self.get_base_power(dest_node) * self.deadline
 
         return total_energy
 
     def get_sorted_mapping_candidate(self, available_nodes, src_nodes, src_tasks, dest_task):
         candidates = {}
-        for i in range(len(available_nodes)):
-            for node in available_nodes[i]:
-                candidates[node] = self.get_total_task_energy(src_nodes, node, src_tasks, dest_task)
+        for node in available_nodes:
+            candidates[node] = self.get_total_task_energy(src_nodes, node, src_tasks, dest_task)
 
         return sorted(candidates, key=lambda x: candidates[x])
 
@@ -223,25 +193,34 @@ class SlackBasedHeuristic(Optimizer):
         candidates = {}
         max_energy = 0
         max_workload = 0
-        for i in range(len(available_nodes)):
-            for node in available_nodes[i]:
-                candidates[node] = {"energy": self.get_total_task_energy(src_nodes, node, src_tasks, dest_task),
-                                    "available_workload": self.workload_slack[node][0]}
-                if candidates[node]["energy"] > max_energy:
-                    max_energy = candidates[node]["energy"]
-                if candidates[node]["available_workload"] > max_workload:
-                    max_workload = candidates[node]["available_workload"]
+        for node in available_nodes:
+            candidates[node] = {"energy": self.get_total_task_energy(src_nodes, node, src_tasks, dest_task), "available_workload": self.workload_slack[node][0]}
+            if candidates[node]["energy"] > max_energy:
+                max_energy = candidates[node]["energy"]
+            if candidates[node]["available_workload"] > max_workload:
+                max_workload = candidates[node]["available_workload"]
 
-        for i in range(len(available_nodes)):
-            for node in available_nodes[i]:
-                candidates[node] = candidates[node]["energy"] / max_energy - candidates[node][
-                    "available_workload"] / max_workload
+        for node in available_nodes:
+            candidates[node] = candidates[node]["energy"] / max_energy - candidates[node]["available_workload"] / max_workload
         return sorted(candidates, key=lambda x: candidates[x])
 
     def slacks_init(self):
         # Initialize channel slack vector
-        for u, v in self.network_links:
-            self.channel_slack[str(u) + "-" + str(v)] = self.get_link_volume(u, v, self.deadline)
+        for u in range(sum(self.nodes)):
+            self.upload_channel_slack.append(
+                [
+                    self.get_node_upload_links_volume(u, 0),
+                    self.get_node_upload_links_volume(u, 1),
+                    self.get_node_upload_links_volume(u, 2),
+                ]
+            )
+            self.download_channel_slack.append(
+                [
+                    self.get_node_download_links_volume(u, 0),
+                    self.get_node_download_links_volume(u, 1),
+                    self.get_node_download_links_volume(u, 2),
+                ]
+            )
 
         # Initialize workload slack vector
         for layer in range(2, -1, -1):
@@ -258,22 +237,52 @@ class SlackBasedHeuristic(Optimizer):
 
         for task in range(0, self.num_tasks):
             if task in self.source_tasks:
-                self.assign(current_device, FASTEST_CORE_GROUP, task, pd.DataFrame(), -1)
-                self.task_mapping.loc[len(self.task_mapping)] = [task, current_device, FASTEST_CORE_GROUP,
-                                                                 self.num_freqs[current_device] - 1, True,
-                                                                 self.instances[task]]
-                self.active_nodes[current_device] = 1
-                current_device += 1
-                if current_device >= num_nodes:
-                    current_device = self.nodes[1] + self.nodes[2]
-            else:
-                self.assign(CLOUD_ID, FASTEST_CORE_GROUP, task, pd.DataFrame(), -1)
-                is_mapped = False
-                if task in self.sink_tasks:
-                    is_mapped = True
-                self.task_mapping.loc[len(self.task_mapping)] = [task, CLOUD_ID, FASTEST_CORE_GROUP,
-                                                                 self.num_freqs[CLOUD_ID] - 1, is_mapped,
-                                                                 self.instances[task]]
+                core_groups = self.get_core_groups_sorted(current_device, self.max_widths[task])
+                if self.assign(current_device, core_groups[0], task, pd.DataFrame(), -1):
+                    self.task_mapping.loc[len(self.task_mapping)] = [task, current_device, core_groups[0],
+                                                                     self.num_freqs[current_device] - 1, True,
+                                                                     self.instances[task]]
+                    self.active_nodes[current_device] = 1
+                    current_device += 1
+                    if current_device >= num_nodes:
+                        current_device = self.nodes[1] + self.nodes[2]
+                else:
+                    return False
+            elif task in self.sink_tasks:
+                predecessors_info = self.get_predecessor_tasks_mapping_info(task)
+                core_groups = self.get_core_groups_sorted(CLOUD_ID, self.max_widths[task])
+                if self.assign(CLOUD_ID, core_groups[0], task, predecessors_info, -1):
+                    self.task_mapping.loc[len(self.task_mapping)] = [task, CLOUD_ID, core_groups[0],
+                                                                     self.num_freqs[CLOUD_ID] - 1, True,
+                                                                     self.instances[task]]
+                else:
+                    return False
+
+        return True
+
+    def remove_unfeasible_candidates(self, task, mapping_candidates, pred_nodes, pred_tasks):
+        feasible_candidates = []
+        successor_tasks = self.get_successor_tasks(task)
+        sink_successors = [t for t in successor_tasks if t in self.sink_tasks]
+        only_edge = False
+        if len(sink_successors) > 0:
+            only_edge = True
+        for mapping_candidate_in_layer in mapping_candidates:
+            for candidate in mapping_candidate_in_layer:
+                candidate_type = self.get_node_type(candidate)
+                if only_edge and candidate_type == 0:
+                    continue
+                for i in range(len(pred_nodes)):
+                    if candidate == pred_nodes[i]:
+                        continue
+                    if self.get_node_available_upload_links_volume(pred_nodes[i], candidate_type) < self.edge_weights[(pred_tasks[i], task)]:
+                        break
+                    if self.get_node_available_download_links_volume(candidate, self.get_node_type(pred_nodes[i])) < \
+                            self.edge_weights[(pred_tasks[i], task)]:
+                        break
+
+                feasible_candidates.append(candidate)
+        return feasible_candidates
 
     def assignment(self):
         q = Queue()
@@ -288,31 +297,30 @@ class SlackBasedHeuristic(Optimizer):
                 predecessors_mapping_info = self.get_predecessor_tasks_mapping_info(current_task)
                 mapped_nodes = predecessors_mapping_info["Node"].tolist()
                 mapped_tasks = predecessors_mapping_info["Task"].tolist()
+
                 mapping_candidate_nodes = self.get_connected_nodes(mapped_nodes)
-                # mapping_candidate_nodes = self.get_sorted_mapping_candidate(mapping_candidate_nodes, mapped_nodes, mapped_tasks, current_task)
-                mapping_candidate_nodes = self.get_sorted_mapping_candidate_by_energy_and_workload(
-                    mapping_candidate_nodes, mapped_nodes, mapped_tasks, current_task)
+                feasible_candidates = self.remove_unfeasible_candidates(current_task, mapping_candidate_nodes,
+                                                                        mapped_nodes, mapped_tasks)
+                # mapping_candidate_nodes = self.get_sorted_mapping_candidate(feasible_candidates, mapped_nodes, mapped_tasks, current_task)
+                mapping_candidate_nodes = self.get_sorted_mapping_candidate_by_energy_and_workload(feasible_candidates,
+                                                                                                   mapped_nodes,
+                                                                                                   mapped_tasks,
+                                                                                                   current_task)
                 is_assigned = False
-                previous_mapping = self.task_mapping.loc[self.task_mapping["Task"] == current_task].iloc[0]
                 for node in mapping_candidate_nodes:
-                    if self.assign(node, FASTEST_CORE_GROUP, current_task, predecessors_mapping_info, -1):
-                        self.unassign(previous_mapping["Node"], previous_mapping["Core Group"], current_task,
-                                      pd.DataFrame(), -1)
-                        self.task_mapping.loc[self.task_mapping["Task"] == current_task] = [current_task, node,
-                                                                                            FASTEST_CORE_GROUP,
-                                                                                            self.num_freqs[node] - 1,
-                                                                                            True, self.instances[
-                                                                                                current_task]]
+                    core_groups = self.get_core_groups_sorted(node, self.max_widths[current_task])
+                    if self.assign(node, core_groups[0], current_task, predecessors_mapping_info, -1):
+                        self.task_mapping.loc[len(self.task_mapping)] = [current_task, node, core_groups[0], self.num_freqs[node] - 1, True, self.instances[current_task]]
                         self.active_nodes[node] = 1
                         is_assigned = True
                         break
                 if not is_assigned:
-                    self.task_mapping.loc[self.task_mapping["Task"] == current_task, "IsMapped"] = True
+                    return False
 
             successor_tasks = self.get_successor_tasks(current_task)
             for suc_tasks in successor_tasks:
                 predecessors_mapping_info = self.get_predecessor_tasks_mapping_info(suc_tasks)
-                if self.is_ready_to_map(predecessors_mapping_info):
+                if self.is_ready_to_map(suc_tasks, predecessors_mapping_info):
                     q.put(suc_tasks)
 
         return True
@@ -339,8 +347,7 @@ class SlackBasedHeuristic(Optimizer):
             sorted_group_frequency_list = self.get_required_energy_on_different_groups_and_frequencies(
                 previous_mapping["Node"], previous_mapping["Task"])
 
-            self.unassign(previous_mapping["Node"], current_core_group, previous_mapping["Task"], pd.DataFrame(),
-                          current_frequency)
+            self.unassign(previous_mapping["Node"], current_core_group, previous_mapping["Task"], current_frequency)
             for ik in sorted_group_frequency_list:
                 ik_arr = ik.split("-")
                 if self.assign(previous_mapping["Node"], int(ik_arr[0]), previous_mapping["Task"], pd.DataFrame(),
@@ -349,39 +356,38 @@ class SlackBasedHeuristic(Optimizer):
                     selected_frequency = int(ik_arr[1])
                     break
 
-        # is_tuned = False
-        # for core_group in range(self.num_groups[previous_mapping["Node"]], 0, -1):
-        #     if not is_tuned:
-        #         self.unassign(previous_mapping["Node"], current_core_group, previous_mapping["Task"],
-        #                       pd.DataFrame(), current_frequency)
-        #         for k in range(self.num_freqs[previous_mapping["Node"]]):
-        #             if self.assign(previous_mapping["Node"], core_group, previous_mapping["Task"], pd.DataFrame(),
-        #                            k):
-        #                 selected_core_group = core_group
-        #                 selected_frequency = k
-        #                 is_tuned = True
-        #                 break
-        #     else:
-        #         break
-
             self.task_mapping.loc[j, "Core Group"] = selected_core_group
             self.task_mapping.loc[j, "Frequency"] = selected_frequency
 
-
     def optimize(self):
+        if self.num_tasks < 3:
+            print("No Feasible Solution")
+            return -1
+
         self.slacks_init()
-        self.seeding()
-        is_feasible = self.assignment()
+
+        is_feasible = self.seeding()
 
         if not is_feasible:
             print("No Feasible Solution")
         else:
-            self.tune_mapping()
+            is_feasible = self.assignment()
+
+            if not is_feasible:
+                print("No Feasible Solution")
+            else:
+                self.tune_mapping()
+                return 1
+
+        return -1
 
     def generate_result(self, output_path):
-        node_energy_consumption = pd.DataFrame(columns=["Node", "Base Power", "Communication", "Computation", "Overall"])
+        node_energy_consumption = pd.DataFrame(
+            columns=["Node", "Base Power", "Communication", "Computation", "Overall"])
         overall_energy_consumption = pd.DataFrame(columns=["Base Power", "Communication", "Computation", "Overall"])
-        edge_mapping = pd.DataFrame(columns=["source node", "source node type", "target node", "target node type", "source task", "source task name", "source task type", "target task", "target task name", "target task type"])
+        edge_mapping = pd.DataFrame(
+            columns=["source node", "source node type", "target node", "target node type", "source task",
+                     "source task name", "source task type", "target task", "target task name", "target task type"])
 
         base_energy_consumption = 0
         for i in range(sum(self.nodes)):
