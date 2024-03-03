@@ -40,6 +40,12 @@ class Optimizer:
         self.power_device_to_edge = network_info["power_device_to_edge"]
         self.bandwidth_edge_to_cloud = network_info["bandwidth_edge_to_cloud"]
         self.power_edge_to_cloud = network_info["power_edge_to_cloud"]
+
+        self.upload_bandwidth_device = network_info["upload_bandwidth_device"]
+        self.download_bandwidth_edge_device = network_info["download_bandwidth_edge_device"]
+        self.upload_bandwidth_edge_cloud = network_info["upload_bandwidth_edge_cloud"]
+        self.download_bandwidth_cloud = network_info["download_bandwidth_cloud"]
+
         self.cores = compute_resource["num_cores"]
         self.num_groups = [self.cores[u] * 2 - 1 for u in range(num_nodes)]
         self.num_freqs = [len(self.freqs[2])] + [len(self.freqs[1])] * self.nodes[1] + [len(self.freqs[0])] * self.nodes[0]
@@ -50,7 +56,7 @@ class Optimizer:
 
         # ---------------- Load Optimizer -----------------
         self.opt_model = grb.Model(name="MIP Model")
-        self.opt_model.setParam('TimeLimit', 5 * 60)
+        self.opt_model.setParam('TimeLimit', 5 * 60 * 60)
         # =================================================
 
         # ------------- Initialize Variables --------------
@@ -127,6 +133,12 @@ class Optimizer:
     def get_group_width(self, group, procs):
         return procs / 2 ** math.floor(math.log(group, 2))
 
+    def get_groups_with_specific_width(self, width, procs):
+        if width > procs:
+            return [1]
+        pwr = math.floor(math.log(procs/width, 2))
+        return [i for i in range(2**pwr, 2**(pwr + 1))]
+
     # Returns per-core runtime of task for given node, group, and core operating frequency
     def get_task_runtime(self, node, cores_on_node, group, workload, max_width, task_type, freq_lvl):
         node_type = self.get_node_type(node)
@@ -184,8 +196,27 @@ class Optimizer:
         # A7 is reference
         lower_bound = total_workload / (cores * self.freqs[0][len(self.freqs[0]) - 1])
         upper_target = total_workload / (cores * self.freqs[0][0])
-        self.deadline = (lower_bound + upper_target) / 2 / 25
+        self.deadline = (lower_bound + upper_target) / 2 / self.nodes[0]
         print("Deadline:", self.deadline)
+
+    def get_node_upload_links_volume(self, node, dest_type):
+        # Link exists, determine type of nodes
+        if self.get_node_type(node) == 0 and dest_type == 1:
+                # Volume depends on bandwidth and round length
+                # Bandwidth is in MBit/s, deadline in s, volume in MB
+            return (self.upload_bandwidth_device / 8) * self.deadline
+        if self.get_node_type(node) == 1 and dest_type == 2:
+            return (self.upload_bandwidth_edge_cloud / 8) * self.deadline
+        return 0.0
+
+    def get_node_download_links_volume(self, node, src_type):
+        if self.get_node_type(node) == 1 and src_type == 0:
+                # Volume depends on bandwidth and round length
+                # Bandwidth is in MBit/s, deadline in s, volume in MB
+            return (self.download_bandwidth_edge_device / 8) * self.deadline
+        if self.get_node_type(node) == 2 and src_type == 1:
+            return (self.download_bandwidth_cloud / 8) * self.deadline
+        return 0.0
 
     def optimize(self):
         pass
