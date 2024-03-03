@@ -82,22 +82,69 @@ class BaseOptimizer(Optimizer):
                 )
 
         # Constraint: every task graph edge must be mapped to network link or to node-local shared memory
-        for r, s in self.edges:
-            self.opt_model.addConstr(
-                lhs=grb.quicksum(self.y_vars[u, v, r, s] for u, v in self.network_links) + grb.quicksum(self.y_vars[u, u, r, s] for u in self.set_U),
-                sense=grb.GRB.EQUAL,
-                rhs=1,
-                name="constraint_all_edges_mapped_{0}_{1}".format(r, s)
-            )
+        # for r, s in self.edges:
+        #     self.opt_model.addConstr(
+        #         lhs=grb.quicksum(self.y_vars[u, v, r, s] for u, v in self.network_links) + grb.quicksum(self.y_vars[u, u, r, s] for u in self.set_U),
+        #         sense=grb.GRB.EQUAL,
+        #         rhs=1,
+        #         name="constraint_all_edges_mapped_{0}_{1}".format(r, s)
+        #     )
 
         # Constraint: network link bandwidth must not be exceeded
-        for u, v in self.network_links:
-            self.opt_model.addConstr(
-                lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r, s)] for r, s in self.edges),
-                sense=grb.GRB.LESS_EQUAL,
-                rhs=self.get_link_volume(u, v, self.deadline),
-                name="constraint_bandwidth_{0}_{1}".format(u, v)
-            )
+        # for u, v in self.network_links:
+        #     self.opt_model.addConstr(
+        #         lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r, s)] for r, s in self.edges),
+        #         sense=grb.GRB.LESS_EQUAL,
+        #         rhs=self.get_link_volume(u, v, self.deadline),
+        #         name="constraint_bandwidth_{0}_{1}".format(u, v)
+        #     )
+        for u in self.set_U:
+            if self.get_node_type(u) == 0:
+                self.opt_model.addConstr(
+                        lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r, s)] for v in self.set_U for r, s in self.edges if self.get_node_type(v) == 1 and (u, v) in self.network_links),
+                        sense=grb.GRB.LESS_EQUAL,
+                        rhs=self.get_node_upload_links_volume(u, 1),
+                        name="constraint_upload_bandwidth_device_{0}".format(u)
+                    )
+            elif self.get_node_type(u) == 2:
+                self.opt_model.addConstr(
+                        lhs=grb.quicksum(self.y_vars[v, u, r, s] * self.edge_weights[(r, s)] for v in self.set_U for r, s in self.edges if self.get_node_type(v) == 1 and (v, u) in self.network_links),
+                        sense=grb.GRB.LESS_EQUAL,
+                        rhs=self.get_node_download_links_volume(u, 1),
+                        name="constraint_download_bandwidth_cloud_{0}".format(u)
+                    )
+            elif self.get_node_type(u) == 1:
+                self.opt_model.addConstr(
+                        lhs=grb.quicksum(self.y_vars[v, u, r, s] * self.edge_weights[(r, s)] for r, s in self.edges for v in self.set_U if self.get_node_type(v) == 0 and (v, u) in self.network_links),
+                        sense=grb.GRB.LESS_EQUAL,
+                        rhs=self.get_node_download_links_volume(u, 0),
+                        name="constraint_download_bandwidth_edge_{0}_from_device".format(u)
+                    )
+                self.opt_model.addConstr(
+                    lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r, s)] for r, s in self.edges for v in self.set_U if self.get_node_type(v) == 2 and (u, v) in self.network_links),
+                    sense=grb.GRB.LESS_EQUAL,
+                    rhs=self.get_node_upload_links_volume(u, 2),
+                    name="constraint_upload_bandwidth_edge_{0}_to_cloud".format(u)
+                )
+
+        # Constraint: output bandwidth must not be exceeded
+        # for u in self.set_U:
+        #     self.opt_model.addConstr(
+        #         lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r, s)] for _, v in self.network_links for r, s in self.edges if u != v),
+        #         sense=grb.GRB.LESS_EQUAL,
+        #         rhs=(self.bandwidth_device_to_edge / 8) * self.deadline,
+        #         name="constraint_out_bandwidth_{0}".format(u)
+        #     )
+
+        # Constraint: input bandwidth must not be exceeded
+        # for _, v in self.network_links:
+        #     self.opt_model.addConstr(
+        #         lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r,s)] for u, _ in self.network_links for r, s in self.edges),
+        #         sense=grb.GRB.LESS_EQUAL,
+        #         rhs=(self.bandwidth_device_to_edge / 8) * self.deadline,
+        #         name="constraint_input_bandwidth_{0}".format(v)
+        #     )
+
 
         # Constraint: no backwards data flow
         for u in self.set_U:
@@ -143,7 +190,7 @@ class BaseOptimizer(Optimizer):
                     lhs=grb.quicksum(self.x_vars[u, i, r, k] for i in self.sets_I[u] for k in self.sets_K[u]) + grb.quicksum(self.x_vars[u, idash, s, kdash] for idash in self.sets_I[u] for kdash in self.sets_K[u]) - 1,
                     sense=grb.GRB.LESS_EQUAL,
                     rhs=self.y_vars[u, u, r, s],
-                    name="constraint_same_node_edge_mapping_{0}_{1}_{2}_{3}".format(u, v, r, s)
+                    name="constraint_same_node_edge_mapping_{0}_{1}_{2}_{3}".format(u, u, r, s)
                 )
 
         # Objective function: energy
