@@ -32,13 +32,19 @@ def main():
         # Create tasks
         for j in range(num_tasks):
             ts_ids[j] = j
-            ts_workloads[j] = random.choice(range(1,MAX_WORKLOAD+1))
+            if j == 0:
+                ts_workloads[j] = random.choice(range(1, MAX_WORKLOAD // 10))
+            else:
+                ts_workloads[j] = random.choice(range(1,MAX_WORKLOAD+1))
             ts_tasktypes[j] = random.choice(TASKTYPES)
             max_width_log = (random.choice(range(int(math.log2(num_cores))+1)))
             ts_max_widths[j] = 2**max_width_log
             while ts_workloads[j] / ts_max_widths[j] > MAX_WORKLOAD/(num_cores/2):
                 # Obtain new values to avoid tasks with huge workloads and small maximum width (obviously, this leads to skewed distribution)
-                ts_workloads[j] = random.choice(range(1,MAX_WORKLOAD+1))
+                if j == 0:
+                    ts_workloads[j] = random.choice(range(1, MAX_WORKLOAD//10))
+                else:
+                    ts_workloads[j] = random.choice(range(1,MAX_WORKLOAD+1))
                 max_width_log = (random.choice(range(int(math.log2(num_cores))+1)))
                 ts_max_widths[j] = 2**max_width_log
         # Collect in data frame and write to file

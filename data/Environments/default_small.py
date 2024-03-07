@@ -100,12 +100,12 @@ env = {
             6, 2, 1
         ],
         "num_cores": [
-            #Devices
-            4, 4, 4, 4, 4, 4,
-            #Edge
+            # Cloud
+            4,
+            # Edge
             4, 4,
-            #Cloud
-            4
+            # Devices
+            4, 4, 4, 4, 4, 4
         ]
 
     }

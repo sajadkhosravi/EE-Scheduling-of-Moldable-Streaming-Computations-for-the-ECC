@@ -235,7 +235,7 @@ class Heuristic(Optimizer):
         for layer in range(2, -1, -1):
             for i in range(self.nodes[layer]):
                 index = i
-                for j in range(layer):
+                for j in range(2, layer, -1):
                     index = index + self.nodes[j]
                 workload_time_array = [self.deadline] * self.num_groups[index]
                 self.workload_slack.append(workload_time_array)

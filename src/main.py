@@ -7,9 +7,13 @@ from optimizer.ILP.symmetryRelaxedOptimizer import SymmetryRelaxedOptimizer
 from optimizer.heuristic.baseHeuristic import Heuristic
 from optimizer.heuristic.relaxedHeuristic import RelaxedHeuristic
 from data.Environments.default import env as default_base_env
+from data.Environments.new_default import env as new_default_base_env
 from data.Environments.default_small import env as default_base_small_env
+from data.Environments.new_default_small import env as new_default_base_small_env
 from data.Environments.relaxed_small import env as default_relaxed_small_env
+from data.Environments.new_relaxed_small import env as new_default_relaxed_small_env
 from data.Environments.relaxed import env as default_relaxed_env
+from data.Environments.new_relaxed import env as new_default_relaxed_env
 from data.Environments.symmetry_default import env as symmetry_base_env
 from data.Environments.symmetry_relaxed import env as symmetry_relaxed_env
 
@@ -27,12 +31,16 @@ if __name__ == '__main__':
     input_filename = sys.argv[3]
     output_path = sys.argv[4]
 
-    base_env = default_base_env
-    relaxed_env = default_relaxed_env
+    # base_env = default_base_env
+    base_env = new_default_base_env
+    # relaxed_env = default_relaxed_env
+    relaxed_env = new_default_relaxed_env
 
     if env_size == "small":
-        base_env = default_base_small_env
-        relaxed_env = default_relaxed_small_env
+        # base_env = default_base_small_env
+        base_env = new_default_base_small_env
+        # relaxed_env = default_relaxed_small_env
+        relaxed_env = new_default_relaxed_small_env
 
     task_graph = igraph.load(input_filename)
 
