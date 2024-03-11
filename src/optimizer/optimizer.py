@@ -56,7 +56,7 @@ class Optimizer:
 
         # ---------------- Load Optimizer -----------------
         self.opt_model = grb.Model(name="MIP Model")
-        self.opt_model.setParam('TimeLimit', 10 * 60)
+        self.opt_model.setParam('TimeLimit', 2 * 60 * 60)
         # =================================================
 
         # ------------- Initialize Variables --------------
@@ -223,6 +223,9 @@ class Optimizer:
 
     def generate_result(self, output_path):
         num_nodes = sum(self.nodes)
+        if self.opt_model.status == 9:
+            print("Time Limit")
+            return -9
         if self.opt_model.SolCount >= 1:
             opt_df = pd.DataFrame.from_dict(self.x_vars, orient="index", columns=["variable_object"])
             opt_df.index = pd.MultiIndex.from_tuples(opt_df.index, names=["node", "group", "task", "frequency"])
@@ -383,3 +386,5 @@ class Optimizer:
             optstatfile.write(
                 os.path.splitext(output_path)[0] + "," + str(self.opt_model.Status) + "," + str(
                     self.opt_model.MIPGap) + "\n")
+
+        return 0
