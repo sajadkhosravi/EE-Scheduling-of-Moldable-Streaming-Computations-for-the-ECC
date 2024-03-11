@@ -80,12 +80,13 @@ if __name__ == '__main__':
 
     print("Optimization (" + optimizer_type + ") Time: " + str(end_time - start_time))
 
-    time_dict = {"Time": [end_time - start_time]}
+    result_status = -1
+    if status != -1:
+        result_status = optimizer.generate_result(output_path)
+
+    time_dict = {"Time": [end_time - start_time], "status": result_status}
     time_df = pd.DataFrame(time_dict)
 
     time_df.to_csv(output_path + "/time.csv")
-    if status != -1:
-        optimizer.generate_result(output_path)
-
     if optimizer_type == "SymmetryBase" or optimizer_type == "SymmetryRelaxed":
         optimizer.data_completer(output_path)
