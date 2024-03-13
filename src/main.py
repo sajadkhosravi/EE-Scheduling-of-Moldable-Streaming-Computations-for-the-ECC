@@ -74,9 +74,9 @@ if __name__ == '__main__':
 
     optimizer.compute_deadline()
 
-    start_time = time.process_time()
+    start_time = time.perf_counter()
     status = optimizer.optimize()
-    end_time = time.process_time()
+    end_time = time.perf_counter()
 
     print("Optimization (" + optimizer_type + ") Time: " + str(end_time - start_time))
 
