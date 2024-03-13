@@ -1,9 +1,8 @@
 import subprocess
-import pandas as pd
 
 def optimization(model_type, input_path, output_path, env_size, lb, ub, graph_type, inp_temp):
     for i in range(lb, ub):
-        subprocess.run("mkdir ./output/" + model_type + "/Random/" + env_size + "/" + graph_type + str(i), shell=True, check=True)
+        subprocess.run("mkdir " + output_path + graph_type + str(i), shell=True, check=True)
         command_template = "python ./src/main.py " + model_type + " " + env_size + " " + input_path + inp_temp + str(i) + ".graphml " + output_path + graph_type + str(i)
         try:
             # Execute the command using subprocess
