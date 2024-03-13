@@ -4,7 +4,7 @@ task_sets_number = 30
 types = ["Base", "BaseHeuristic", "Relaxed", "RelaxedHeuristic"]
 task_types = ["Chain", "FullyParallel"]
 env_sizes = ["small", "medium"]
-deadlines = ["Short", "Medium", "Long"]
+deadlines = ["Medium", "Long", "VeryLong"]
 
 infeasible_solutions = pd.DataFrame(columns=["Approach", "Task", "Count"])
 for deadline in deadlines:
@@ -67,3 +67,6 @@ for deadline in deadlines:
                 df.to_csv("../../output/"+type_name+ "/" + deadline + "Deadline/Random/"+env_size+"/Random"+task_type+"_time.csv")
 
                 print(str(no_feasible_solution_count) + " of test cases of " + task_type +" with env size " + env_size + " don't have any feasible solution by " + type_name + " approach")
+
+
+    print("----------------------------------------------")

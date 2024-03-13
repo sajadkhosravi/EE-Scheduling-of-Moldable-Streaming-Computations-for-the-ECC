@@ -365,5 +365,5 @@ random_graph_tasks = [
 
 for task in random_graph_tasks:
     for mt in task["method_types"]:
-        input_dir = "./data/Workflows/NewTasks/RandomGraphs/smallGraph/" + task["graph_type"] + "/"
+        input_dir = "./data/Workflows/NewTasks/RandomGraphs/smallGraph/"
         optimization(mt, input_dir, task["env_size"], task["lb"], task["ub"], task["graph_type"], task["input_temp"])
