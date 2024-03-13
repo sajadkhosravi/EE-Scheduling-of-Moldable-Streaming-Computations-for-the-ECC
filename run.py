@@ -1,10 +1,10 @@
 import subprocess
 import pandas as pd
 
-def optimization(model_type, input_path, env_size, lb, ub, graph_type, inp_temp):
+def optimization(model_type, input_path, output_path, env_size, lb, ub, graph_type, inp_temp):
     for i in range(lb, ub):
         subprocess.run("mkdir ./output/" + model_type + "/Random/" + env_size + "/" + graph_type + str(i), shell=True, check=True)
-        command_template = "python ./src/main.py " + model_type + " " + env_size + " " + input_path + inp_temp + str(i) + ".graphml ./output/" + model_type + "/Random/" + env_size + "/" + graph_type + str(i)
+        command_template = "python ./src/main.py " + model_type + " " + env_size + " " + input_path + inp_temp + str(i) + ".graphml " + output_path + graph_type + str(i)
         try:
             # Execute the command using subprocess
             subprocess.run(command_template, shell=True, check=True)
@@ -362,8 +362,11 @@ random_graph_tasks = [
 #         input_dir = "./data/Workflows/NewTasks/" + task["graph_type"] + "/"
 #         optimization(mt, input_dir, task["env_size"], task["lb"], task["ub"], task["graph_type"], task["input_temp"])
 
+graph_sizes = ["small", "medium", "large"]
 
-for task in random_graph_tasks:
-    for mt in task["method_types"]:
-        input_dir = "./data/Workflows/NewTasks/RandomGraphs/smallGraph/"
-        optimization(mt, input_dir, task["env_size"], task["lb"], task["ub"], task["graph_type"], task["input_temp"])
+for graph_size in graph_sizes:
+    for task in random_graph_tasks:
+        for mt in task["method_types"]:
+            input_dir = "./data/Workflows/NewTasks/RandomGraphs/" + graph_size + "Graph/"
+            output_dir = "./output/" + mt + "/Random/" + graph_size + "Graph/" + task["env_size"] + "/"
+            optimization(mt, input_dir, output_dir, task["env_size"], task["lb"], task["ub"], task["graph_type"], task["input_temp"])
