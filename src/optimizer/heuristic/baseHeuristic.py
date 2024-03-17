@@ -22,6 +22,37 @@ class Heuristic(Optimizer):
     def get_node_available_download_links_volume(self, node, src_type):
         return self.download_channel_slack[node][src_type]
 
+    def get_link_volume(self, orig_node, dest_node, deadline):
+        if orig_node == dest_node:
+            return float('inf')
+        if not (orig_node, dest_node) in self.network_links:
+            return 0
+        # Link exists, determine type of nodes
+        if self.get_node_type(orig_node) == 0 and self.get_node_type(dest_node) == 1:
+            # Volume depends on bandwidth and round length
+            # Bandwidth is in MBit/s, deadline in s, volume in MB
+            return (self.bandwidth_device_to_edge / 8) * deadline
+        if self.get_node_type(orig_node) == 1 and self.get_node_type(dest_node) == 2:
+            return (self.bandwidth_edge_to_cloud / 8) * deadline
+        return 0.0
+
+    def get_comm_energy(self, orig_node, dest_node, data_amount):
+        # data to transfer is given in MB
+        # Bandwidth is in MBit/s, power in W
+        if orig_node == dest_node:
+            return 0.0
+        elif self.get_node_type(orig_node) == 0 and self.get_node_type(dest_node) == 1:
+            bandwidth = self.bandwidth_device_to_edge
+            power = self.power_device_to_edge
+        elif self.get_node_type(orig_node) == 1 and self.get_node_type(dest_node) == 2:
+            bandwidth = self.bandwidth_edge_to_cloud
+            power = self.power_edge_to_cloud
+        else:
+            return float("inf")
+        comm_duration = data_amount / (bandwidth / 8)
+        # Communication energy is in J
+        return comm_duration * power
+
     def get_connected_nodes(self, predecessor_nodes):
         connected_nodes = [[], [], []]
         connected_nodes_dict = {}
