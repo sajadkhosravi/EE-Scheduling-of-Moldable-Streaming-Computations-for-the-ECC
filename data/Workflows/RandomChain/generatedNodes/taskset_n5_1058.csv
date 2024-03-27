@@ -1,6 +1,0 @@
-id,workload,max_width,tasktype
-0,2,1,MEMORY
-1,92,2,MEMORY
-2,56,2,FMULT
-3,17,4,MEMORY
-4,20,4,FMULT

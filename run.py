@@ -39,9 +39,9 @@ known_graph_tasks = [
         "method_types": ["Base"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "small",
-        "input_temp": "fully_parallel_5_tasks_6_task_sets_random_graph_small_data_",
+        "input_temp": "independent_5_tasks_6_task_sets_random_graph_small_data_",
         "lb": 0,
         "ub": 10,
         "method_types": ["Base"]
@@ -49,7 +49,7 @@ known_graph_tasks = [
     {
         "graph_type": "RandomFullyParallel",
         "env_size": "small",
-        "input_temp": "fully_parallel_5_tasks_6_task_sets_random_graph_medium_data_",
+        "input_temp": "independent_5_tasks_6_task_sets_random_graph_medium_data_",
         "lb": 10,
         "ub": 20,
         "method_types": ["Base"]
@@ -57,7 +57,7 @@ known_graph_tasks = [
     {
         "graph_type": "RandomFullyParallel",
         "env_size": "small",
-        "input_temp": "fully_parallel_5_tasks_6_task_sets_random_graph_large_data_",
+        "input_temp": "independent_5_tasks_6_task_sets_random_graph_large_data_",
         "lb": 20,
         "ub": 30,
         "method_types": ["Base"]
@@ -87,9 +87,9 @@ known_graph_tasks = [
         "method_types": ["BaseHeuristic", "RelaxedHeuristic"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "small",
-        "input_temp": "fully_parallel_5_tasks_6_task_sets_random_graph_small_data_",
+        "input_temp": "independent_5_tasks_6_task_sets_random_graph_small_data_",
         "lb": 0,
         "ub": 10,
         "method_types": ["BaseHeuristic", "RelaxedHeuristic"]
@@ -97,7 +97,7 @@ known_graph_tasks = [
     {
         "graph_type": "RandomFullyParallel",
         "env_size": "small",
-        "input_temp": "fully_parallel_5_tasks_6_task_sets_random_graph_medium_data_",
+        "input_temp": "independent_5_tasks_6_task_sets_random_graph_medium_data_",
         "lb": 10,
         "ub": 20,
         "method_types": ["BaseHeuristic", "RelaxedHeuristic"]
@@ -105,7 +105,7 @@ known_graph_tasks = [
     {
         "graph_type": "RandomFullyParallel",
         "env_size": "small",
-        "input_temp": "fully_parallel_5_tasks_6_task_sets_random_graph_large_data_",
+        "input_temp": "independent_5_tasks_6_task_sets_random_graph_large_data_",
         "lb": 20,
         "ub": 30,
         "method_types": ["BaseHeuristic", "RelaxedHeuristic"]
@@ -135,25 +135,25 @@ known_graph_tasks = [
         "method_types": ["Relaxed"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "small",
-        "input_temp": "fully_parallel_5_tasks_6_task_sets_random_graph_small_data_",
+        "input_temp": "independent_5_tasks_6_task_sets_random_graph_small_data_",
         "lb": 0,
         "ub": 10,
         "method_types": ["Relaxed"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "small",
-        "input_temp": "fully_parallel_5_tasks_6_task_sets_random_graph_medium_data_",
+        "input_temp": "independent_5_tasks_6_task_sets_random_graph_medium_data_",
         "lb": 10,
         "ub": 20,
         "method_types": ["Relaxed"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "small",
-        "input_temp": "fully_parallel_5_tasks_6_task_sets_random_graph_large_data_",
+        "input_temp": "independent_5_tasks_6_task_sets_random_graph_large_data_",
         "lb": 20,
         "ub": 30,
         "method_types": ["Relaxed"]
@@ -183,25 +183,25 @@ known_graph_tasks = [
         "method_types": ["Base"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "medium",
-        "input_temp": "fully_parallel_5_tasks_12_task_sets_random_graph_small_data_",
+        "input_temp": "independent_5_tasks_12_task_sets_random_graph_small_data_",
         "lb": 0,
         "ub": 10,
         "method_types": ["Base"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "medium",
-        "input_temp": "fully_parallel_5_tasks_12_task_sets_random_graph_medium_data_",
+        "input_temp": "independent_5_tasks_12_task_sets_random_graph_medium_data_",
         "lb": 10,
         "ub": 20,
         "method_types": ["Base"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "medium",
-        "input_temp": "fully_parallel_5_tasks_12_task_sets_random_graph_large_data_",
+        "input_temp": "independent_5_tasks_12_task_sets_random_graph_large_data_",
         "lb": 20,
         "ub": 30,
         "method_types": ["Base"]
@@ -231,25 +231,25 @@ known_graph_tasks = [
         "method_types": ["BaseHeuristic", "RelaxedHeuristic"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "medium",
-        "input_temp": "fully_parallel_5_tasks_12_task_sets_random_graph_small_data_",
+        "input_temp": "independent_5_tasks_12_task_sets_random_graph_small_data_",
         "lb": 0,
         "ub": 10,
         "method_types": ["BaseHeuristic", "RelaxedHeuristic"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "medium",
-        "input_temp": "fully_parallel_5_tasks_12_task_sets_random_graph_medium_data_",
+        "input_temp": "independent_5_tasks_12_task_sets_random_graph_medium_data_",
         "lb": 10,
         "ub": 20,
         "method_types": ["BaseHeuristic", "RelaxedHeuristic"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "medium",
-        "input_temp": "fully_parallel_5_tasks_12_task_sets_random_graph_large_data_",
+        "input_temp": "independent_5_tasks_12_task_sets_random_graph_large_data_",
         "lb": 20,
         "ub": 30,
         "method_types": ["BaseHeuristic", "RelaxedHeuristic"]
@@ -279,25 +279,25 @@ known_graph_tasks = [
         "method_types": ["Relaxed"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "medium",
-        "input_temp": "fully_parallel_5_tasks_12_task_sets_random_graph_small_data_",
+        "input_temp": "independent_5_tasks_12_task_sets_random_graph_small_data_",
         "lb": 0,
         "ub": 10,
         "method_types": ["Relaxed"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "medium",
-        "input_temp": "fully_parallel_5_tasks_12_task_sets_random_graph_medium_data_",
+        "input_temp": "independent_5_tasks_12_task_sets_random_graph_medium_data_",
         "lb": 10,
         "ub": 20,
         "method_types": ["Relaxed"]
     },
     {
-        "graph_type": "RandomFullyParallel",
+        "graph_type": "RandomIndependent",
         "env_size": "medium",
-        "input_temp": "fully_parallel_5_tasks_12_task_sets_random_graph_large_data_",
+        "input_temp": "independent_5_tasks_12_task_sets_random_graph_large_data_",
         "lb": 20,
         "ub": 30,
         "method_types": ["Relaxed"]
@@ -356,10 +356,10 @@ random_graph_tasks = [
 ]
 
 
-# for task in known_graph_tasks:
-#     for mt in task["method_types"]:
-#         input_dir = "./data/Workflows/NewTasks/" + task["graph_type"] + "/"
-#         optimization(mt, input_dir, task["env_size"], task["lb"], task["ub"], task["graph_type"], task["input_temp"])
+for task in known_graph_tasks:
+    for mt in task["method_types"]:
+        input_dir = "./data/Workflows/NewTasks/" + task["graph_type"] + "/"
+        optimization(mt, input_dir, task["env_size"], task["lb"], task["ub"], task["graph_type"], task["input_temp"])
 
 graph_sizes = ["small", "medium", "large"]
 

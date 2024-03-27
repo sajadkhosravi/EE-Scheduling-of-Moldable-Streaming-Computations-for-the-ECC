@@ -194,7 +194,7 @@ class BaseOptimizer(Optimizer):
                 )
 
         # Objective function: energy
-        objective = grb.quicksum(self.get_base_power(u) * self.deadline * self.z_vars[u] for u in self.set_U) + grb.quicksum(self.get_task_energy(u, self.cores[u], i, self.workloads[j], self.max_widths[j], self.task_types[j], k) * self.x_vars[u, i, j, k] for u in self.set_U for i in self.sets_I[u] for j in self.set_J for k in self.sets_K[u]) + grb.quicksum(self.get_comm_energy(u, v, self.edge_weights[(r, s)]) * self.y_vars[u, v, r, s] for u, v in self.network_links for r, s in self.edges)
+        objective = grb.quicksum(self.get_base_power(u) * self.deadline * self.z_vars[u] for u in self.set_U) + grb.quicksum(self.get_task_energy(u, self.cores[u], i, self.workloads[j], self.max_widths[j], self.task_types[j], k) * self.x_vars[u, i, j, k] for u in self.set_U for i in self.sets_I[u] for j in self.set_J for k in self.sets_K[u]) + grb.quicksum(self.get_comm_energy(u, v, self.edge_weights[(r, s)]) * self.y_vars[u, v, r, s] for u, v in self.network_links for r, s in self.edges) + grb.quicksum(self.y_vars[u, v, r, s] * 100 for u in self.set_U for v in self.set_U for r, s in self.edges)
 
         self.opt_model.ModelSense = grb.GRB.MINIMIZE
         self.opt_model.setObjective(objective)

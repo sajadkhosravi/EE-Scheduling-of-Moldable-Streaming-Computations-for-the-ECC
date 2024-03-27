@@ -193,7 +193,6 @@ class Optimizer:
     def compute_deadline(self):
         cores = self.cores[0]
         total_workload = sum(self.workloads)
-        # A7 is reference
         lower_bound = total_workload / (cores * self.freqs[0][len(self.freqs[0]) - 1])
         upper_target = total_workload / (cores * self.freqs[0][0])
         self.deadline = (lower_bound + upper_target) / 2 / self.nodes[0]
