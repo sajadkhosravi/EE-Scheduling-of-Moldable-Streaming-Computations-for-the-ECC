@@ -4,20 +4,18 @@ env = {
             (1, 0), (2, 0),  # edge to cloud
             (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1),  # devices to edge 1
             (3, 2), (4, 2), (5, 2), (6, 2), (7, 2), (8, 2),  # devices to edge 2
-            (3, 0), (4, 0), (5, 0), (6, 0), (7, 0), (8, 0),
-            # devices to cloud
-            (1, 2),  # edge 1 to edge 2
-            (2, 1),  # edge 1 to edge 2
         ],
-        "bandwidth_device_to_edge": 18,
-        "power_device_to_edge": 0.7,
-        "bandwidth_edge_to_cloud": 100,
-        "power_edge_to_cloud": 0.3,
-        "bandwidth_edge_to_edge": 100,
-        "power_edge_to_edge": 0.3,
-        "bandwidth_device_to_cloud": 18,
-        "power_device_to_cloud": 0.7
+        "bandwidth_device_to_edge": 191,
+        # Consider linear relation between bandwidth and power
+        "power_device_to_edge": 7.43,
+        "bandwidth_edge_to_cloud": 1000,
+        "power_edge_to_cloud": 3.0,
 
+
+        "upload_bandwidth_device": 191,
+        "download_bandwidth_edge_device": 191,
+        "upload_bandwidth_edge_cloud": 1000,
+        "download_bandwidth_cloud": 1000,
     },
 
     "power": {
@@ -102,15 +100,13 @@ env = {
             6, 2, 1
         ],
         "num_cores": [
-            # Devices
-            4, 4, 4, 4, 4, 4,
+            # Cloud
+            4,
             # Edge
             4, 4,
-            # Cloud
-            4
+            # Devices
+            4, 4, 4, 4, 4, 4
         ]
 
-    },
-
-    "level": 2
+    }
 }
