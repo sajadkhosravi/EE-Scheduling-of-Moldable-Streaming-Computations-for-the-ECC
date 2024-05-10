@@ -36,7 +36,7 @@ if __name__ == '__main__':
         optimizer = RelaxedOptimizer(task_graph, relaxed_env["compute_resources"], relaxed_env["network"],
                                      relaxed_env["execution_time_multipliers"], relaxed_env["power"])
 
-    elif optimizer_type == "BaseHeuristic":
+    elif optimizer_type == "StrictHeuristic":
         optimizer = Heuristic(task_graph, base_env["compute_resources"],
                                              base_env["network"],
                                              base_env["execution_time_multipliers"],
