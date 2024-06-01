@@ -8,6 +8,7 @@ from data.Environments.default import env as default_base_env
 from data.Environments.default_small import env as default_base_small_env
 from data.Environments.default_large import env as default_base_large_env
 from data.Environments.relaxed_small import env as default_relaxed_small_env
+from data.Environments.relaxed_large import env as default_relaxed_large_env
 from data.Environments.relaxed import env as default_relaxed_env
 
 import sys
@@ -33,7 +34,7 @@ if __name__ == '__main__':
 
     elif env_size == "large":
         base_env = default_base_large_env
-        relaxed_env = default_relaxed_small_env
+        relaxed_env = default_relaxed_large_env
 
     task_graph = igraph.load(input_filename)
 
