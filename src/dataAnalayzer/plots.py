@@ -66,7 +66,7 @@ def plot_merged(data, x_labels, y_label, legend_labels, colors, output_file_name
     plt.ylabel(y_label, fontsize=30)
     plt.yticks(fontsize=28)
     plt.ylim(0, max_value * 1.5)
-    plt.legend(fontsize=20, loc='center left', bbox_to_anchor=(1, 0.5), ncol=1)
+    # plt.legend(fontsize=20, loc='center left', bbox_to_anchor=(1, 0.5), ncol=1)
 
     plt.savefig(output_file_name, format="png", bbox_inches='tight')
     plt.close()
@@ -93,10 +93,21 @@ def rates_plot_merged(data, x_labels, y_label, legend_labels, colors, output_fil
     plt.ylabel(y_label, fontsize=30)
     plt.yticks(fontsize=28)
     plt.ylim(0, 100)
-    plt.legend(fontsize=20, loc='center left', bbox_to_anchor=(1, 0.5), ncol=1)
+    # plt.legend(fontsize=20, loc='center left', ncol=4)
     plt.savefig(output_file_name, format="png", bbox_inches='tight')
     plt.close()
 
+def generate_legend(legend_labels, colors, output_file_name):
+    fig = plt.figure()
+
+    for i in range(len(legend_labels)):
+        bars = plt.plot([], [], color=colors[i], label=legend_labels[i], linewidth=10)
+
+    plt.axis('off')
+    legend = plt.legend(fontsize=20, loc='center', ncol=2)
+    # bbox = legend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+    fig.savefig(output_file_name, dpi='figure', bbox_inches='tight', pad_inches=0)
+    plt.close()
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -186,7 +197,8 @@ if __name__ == '__main__':
                                 OUTPUT_PATH + '/' + env_size + 'Arch/' + deadlines[deadline_idx] + 'Deadline/' +
                                 methods[
                                     method_idx] + '/Random/' + random_task_set + '_time.csv')
-                            times[deadline_idx].append(time.iloc[0]["Time"])
+                            timeout_cases = time.iloc[0]["timeout"]
+                            times[deadline_idx].append(((timeout_cases * 30 * 60) + (time.iloc[0]["Time"] * (30 - timeout_cases))) / 30)
                             random_rates[deadline_idx].append(
                                 round(((30 - time.iloc[0]["infeasible"] - time.iloc[0]["timeout"]) / 30) * 100))
                             timeout_rates[deadline_idx].append(round(((time.iloc[0]["timeout"]) / 30) * 100))
@@ -263,7 +275,8 @@ if __name__ == '__main__':
                                 OUTPUT_PATH + '/' + env_size + 'Arch/' + deadlines[deadline_idx] + 'Deadline/' +
                                 methods[
                                     method_idx] + '/RandomDAG/' + graph_size + 'Graph/Average_time.csv')
-                            times[deadline_idx].append(time.iloc[0]["Time"])
+                            timeout_cases = time.iloc[0]["timeout"]
+                            times[deadline_idx].append(((timeout_cases * 30 * 60) + (time.iloc[0]["Time"] * (30 - timeout_cases))) / 30)
                             random_rates[deadline_idx].append(
                                 round(((30 - time.iloc[0]["infeasible"] - time.iloc[0]["timeout"]) / 30) * 100))
                             timeout_rates[deadline_idx].append(round(((time.iloc[0]["timeout"]) / 30) * 100))
@@ -310,3 +323,6 @@ if __name__ == '__main__':
                                 ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
                                 ["darkred", "red", "tomato", "orange"],
                                      OUTPUT_PATH + '/charts/' + env_size + 'Arch/RandomDAG/' + graph_size + "_overall_time_comparison.png")
+
+    generate_legend(["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
+                                ["darkred", "red", "tomato", "orange"],  OUTPUT_PATH + '/charts/legend.png')

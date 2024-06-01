@@ -1,11 +1,12 @@
 import pandas as pd
 
-from optimizer.ILP.baseOptimizer import BaseOptimizer
+from optimizer.ILP.strictOptimizer import BaseOptimizer
 from optimizer.ILP.relaxedOptimizer import RelaxedOptimizer
-from optimizer.heuristic.baseHeuristic import Heuristic
+from optimizer.heuristic.strictHeuristic import Heuristic
 from optimizer.heuristic.relaxedHeuristic import RelaxedHeuristic
 from data.Environments.default import env as default_base_env
 from data.Environments.default_small import env as default_base_small_env
+from data.Environments.default_large import env as default_base_large_env
 from data.Environments.relaxed_small import env as default_relaxed_small_env
 from data.Environments.relaxed import env as default_relaxed_env
 
@@ -28,6 +29,10 @@ if __name__ == '__main__':
 
     if env_size == "small":
         base_env = default_base_small_env
+        relaxed_env = default_relaxed_small_env
+
+    elif env_size == "large":
+        base_env = default_base_large_env
         relaxed_env = default_relaxed_small_env
 
     task_graph = igraph.load(input_filename)

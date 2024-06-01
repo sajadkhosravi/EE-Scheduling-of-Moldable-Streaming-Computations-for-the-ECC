@@ -359,7 +359,8 @@ random_graph_tasks = [
 for task in known_graph_tasks:
     for mt in task["method_types"]:
         input_dir = "./data/Workflows/" + task["graph_type"] + "/"
-        optimization(mt, input_dir, task["env_size"], task["lb"], task["ub"], task["graph_type"], task["input_temp"])
+        output_dir = "./output/" + mt + "/Random/" + task["env_size"] + "/"
+        optimization(mt, input_dir, output_dir, task["env_size"], task["lb"], task["ub"], task["graph_type"], task["input_temp"])
 
 graph_sizes = ["small", "medium", "large"]
 

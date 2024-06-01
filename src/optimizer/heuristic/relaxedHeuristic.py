@@ -1,4 +1,4 @@
-from .baseHeuristic import Heuristic
+from .strictHeuristic import Heuristic
 
 CLOUD_ID = 0
 
