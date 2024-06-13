@@ -56,7 +56,7 @@ class Optimizer:
 
         # ---------------- Load Optimizer -----------------
         self.opt_model = grb.Model(name="MIP Model")
-        self.opt_model.setParam('TimeLimit', 30 * 60)
+        self.opt_model.setParam('TimeLimit', 3)
         # =================================================
 
         # ------------- Initialize Variables --------------
@@ -220,12 +220,36 @@ class Optimizer:
     def optimize(self):
         pass
 
+    def check_required_constraint(self):
+        for u, v in self.network_links:
+            for r, s in self.edges:
+                var0 = self.y_vars[u, v, r, s].X
+                var1 = 0
+                var2 = 0
+                for i in self.sets_I[u]:
+                    for k in self.sets_K[u]:
+                        var1 += self.x_vars[u, i, r, k].X
+                for idash in self.sets_I[v]:
+                    for kdash in self.sets_K[v]:
+                        var2 += self.x_vars[v, idash, s, kdash].X
+
+                if var0 < var1 + var2 - 1:
+                    return False
+
+        return True
+
+
     def generate_result(self, output_path):
         num_nodes = sum(self.nodes)
+        timeout = False
+        infeasible = False
         if self.opt_model.status == 9:
-            print("Time Limit")
-            return -9
+            timeout = True
         if self.opt_model.SolCount >= 1:
+            if timeout:
+                is_feasible = self.check_required_constraint()
+                if not is_feasible:
+                    return -9
             opt_df = pd.DataFrame.from_dict(self.x_vars, orient="index", columns=["variable_object"])
             opt_df.index = pd.MultiIndex.from_tuples(opt_df.index, names=["node", "group", "task", "frequency"])
             opt_df.reset_index(inplace=True)
@@ -234,8 +258,6 @@ class Optimizer:
             opt_df.sort_values(by=["task"], inplace=True)
 
             opt_df_exp = opt_df[opt_df.solution_value > 0.5]
-
-            # print(opt_df_exp)
 
             output_filename = "Distributed_crown_scheduling_alloction.csv"
             opt_df_exp.to_csv(output_path + "/" + output_filename, index=False,
@@ -248,19 +270,13 @@ class Optimizer:
             y_df["solution_value"] = y_df["variable_object"].apply(lambda item: item.X)
             y_df.drop(columns=["variable_object"], inplace=True)
             y_df_exp = y_df[y_df.solution_value > 0.5]
-            # print(y_df_exp)
 
             z_df = pd.DataFrame.from_dict(self.z_vars, orient="index", columns=["variable_object"])
             z_df["solution_value"] = z_df["variable_object"].apply(lambda item: item.X)
             z_df.drop(columns=["variable_object"], inplace=True)
-            # print(z_df)
 
             z_df.to_csv(output_path + "/active_nodes.csv")
 
-            # print("Total tasks:", self.num_tasks)
-            # print("Total tasks mapped:", len(opt_df_exp.index))
-            # print("Total edges:", len(self.edges))
-            # print("Total edges mapped:", len(y_df_exp.index))
 
             active_nodes = z_df['solution_value'].tolist()
             active_nodes = [int(i) for i in active_nodes]
@@ -269,7 +285,6 @@ class Optimizer:
             for i in range(len(active_nodes)):
                 nodes_idle_energies[i] = self.get_base_power(i) * self.deadline * active_nodes[i]
                 total_node_energy += nodes_idle_energies[i]
-            # print("Total energy for keeping nodes active (base power):", total_node_energy)
 
             node_mapping = opt_df_exp['node'].tolist()
             group_mapping = opt_df_exp['group'].tolist()
@@ -280,7 +295,6 @@ class Optimizer:
                                                           group_mapping[i],
                                                           self.workloads[i], self.max_widths[i], self.task_types[i],
                                                           assigned_freqs[i])
-            # print("Total energy consumed for execution of tasks:", total_task_energy)
 
             comm_source_nodes = y_df_exp['link_source'].tolist()
             comm_target_nodes = y_df_exp['link_target'].tolist()
@@ -295,9 +309,6 @@ class Optimizer:
                 comm_node_energies[comm_source_nodes[i]] += consumed_energy / 2
                 comm_node_energies[comm_target_nodes[i]] += consumed_energy / 2
                 total_comm_energy += consumed_energy
-            # print("Total energy consumed for communication:", total_commenergy)
-            # print("Total energy consumed overall:", total_nodeenergy + total_taskenergy + total_commenergy)
-            # print("Deadline (round length):", deadline)
 
             node_computational_energies = [0.0] * num_nodes
             task_energies = [0.0] * self.num_tasks
@@ -307,10 +318,6 @@ class Optimizer:
                                                    self.max_widths[i], self.task_types[i], assigned_freqs[i])
                 node_computational_energies[node_mapping[i]] += task_energy
                 task_energies[i] = task_energy
-
-            # print("Node energies:")
-            # for i in range(NUM_NODES):
-            #     print("Node {}: {}".format(i, node_computational_energies[i]))
 
             node_energies = [0.0] * num_nodes
             for i in range(num_nodes):
@@ -330,12 +337,6 @@ class Optimizer:
                 dcs.write("Base Power,Communication,Computation,Overall\n")
                 dcs.write("{},{},{},{}\n".format(total_node_energy, total_comm_energy, total_task_energy,
                                                  total_node_energy + total_task_energy + total_comm_energy))
-
-            #
-            # with open(output_path + "/nodes_energy.csv", 'w') as dcs:
-            #     dcs.write("node,energy\n")
-            #     for i in range(NUM_NODES):
-            #         dcs.write("{},{}\n".format(i, node_energies[i]))
 
             with open(output_path + "/distr_crown_sched.csv", 'w') as dcs:
                 dcs.write("node,node type,instance,task,task name,task type,group,frequency level,task energy\n")
@@ -360,25 +361,18 @@ class Optimizer:
                                                                        self.task_names[comm_target_edges[i]],
                                                                        self.task_types[comm_target_edges[i]]))
 
-            # print("Constraint slack values for edge mapping:")
-            # for u,v in NETWORK_LINKS:
-            #     for r,s in taskgraph_edges:
-            #         if r ==0 and s==3:
-            #             slack = opt_model.getConstrByName("constraint_edges_mapped_one_{0}_{1}_{2}_{3}".format(u,v,r,s)).Slack
-            #             print("({},{},{},{}): {}".format(u,v,r,s,slack))
-
             with open(output_path + "/energy_distr_crown.csv", 'a+') as energyfile:
                 if os.path.getsize(output_path + "/energy_distr_crown.csv") == 0:
                     energyfile.write("taskset,energy_consumption\n")
                 energyfile.write(os.path.splitext(output_path)[0] + "," + str(self.opt_model.objVal) + "\n")
 
-            # print('Obj: %g' % self.opt_model.objVal)
         else:
             print("No feasible solution found!")
             with open(output_path + "/energy_distr_crown.csv", 'a') as energyfile:
                 if os.path.getsize(output_path + "/energy_distr_crown.csv") == 0:
                     energyfile.write("taskset,energy_consumption\n")
                 energyfile.write(os.path.splitext(output_path)[0] + "," + "\n")
+            infeasible = True
         with open(output_path + "/optstat_distr_crown.csv", 'a') as optstatfile:
             if os.path.getsize(output_path + "/optstat_distr_crown.csv") == 0:
                 optstatfile.write("taskset,optimization status,MIPGap\n")
@@ -386,4 +380,8 @@ class Optimizer:
                 os.path.splitext(output_path)[0] + "," + str(self.opt_model.Status) + "," + str(
                     self.opt_model.MIPGap) + "\n")
 
-        return 0
+        if infeasible:
+            return -1
+        if timeout:
+            return -8
+        return 1

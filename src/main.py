@@ -28,11 +28,11 @@ if __name__ == '__main__':
     base_env = default_base_env
     relaxed_env = default_relaxed_env
 
-    if env_size == "small":
+    if env_size == "Small":
         base_env = default_base_small_env
         relaxed_env = default_relaxed_small_env
 
-    elif env_size == "large":
+    elif env_size == "Large":
         base_env = default_base_large_env
         relaxed_env = default_relaxed_large_env
 
@@ -63,9 +63,9 @@ if __name__ == '__main__':
 
     result_status = -1
     if status != -1:
-        result_status = optimizer.generate_result(output_path)
+        status = optimizer.generate_result(output_path)
 
-    time_dict = {"Time": [end_time - start_time], "status": result_status}
+    time_dict = {"Time": [end_time - start_time], "status": status}
     time_df = pd.DataFrame(time_dict)
 
     time_df.to_csv(output_path + "/time.csv")
