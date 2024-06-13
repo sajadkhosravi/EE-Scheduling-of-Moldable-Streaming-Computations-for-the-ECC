@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
                 plot_merged(avg_energy_consumptions,
                             ["Tight", "Moderate", "Loose"],
-                            'Average Energy',
+                            'Average Power',
                             ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
                             ["darkred", "red", "tomato", "orange"],
                             OUTPUT_PATH + '/charts/' + env_size + 'Arch/SDE/average_energy_comparison.png')
@@ -213,7 +213,7 @@ if __name__ == '__main__':
 
                     plot_merged(avg_random_energy_consumptions,
                                 ["Tight", "Moderate", "Loose"],
-                                'Average Energy',
+                                'Average Power',
                                 ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
                                 ["darkred", "red", "tomato", "orange"],
                                 OUTPUT_PATH + '/charts/' + env_size + 'Arch/Random/' + random_task_set + '_average_energy_comparison.png')
@@ -291,7 +291,7 @@ if __name__ == '__main__':
 
                     plot_merged(avg_random_energy_consumptions,
                                 ["Tight", "Moderate", "Loose"],
-                                'Average Energy',
+                                'Average Power',
                                 ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
                                 ["darkred", "red", "tomato", "orange"],
                                 OUTPUT_PATH + '/charts/' + env_size + 'Arch/RandomDAG/' + graph_size + '_average_energy_comparison.png')
