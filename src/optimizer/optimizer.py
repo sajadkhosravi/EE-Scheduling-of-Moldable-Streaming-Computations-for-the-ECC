@@ -56,7 +56,7 @@ class Optimizer:
 
         # ---------------- Load Optimizer -----------------
         self.opt_model = grb.Model(name="MIP Model")
-        self.opt_model.setParam('TimeLimit', 3)
+        self.opt_model.setParam('TimeLimit', 15 * 60)
         # =================================================
 
         # ------------- Initialize Variables --------------
