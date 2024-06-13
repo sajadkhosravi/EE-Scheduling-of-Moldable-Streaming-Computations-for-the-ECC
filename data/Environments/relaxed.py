@@ -1,13 +1,13 @@
 env = {
     "network": {
         "network_links": [
-            (1, 0), (2, 0), (3, 0), (4, 0),  # edge to cloud
-            (5, 1), (6, 1), (7, 1), (8, 1), (9, 1), (10, 1),  # devices to edge 1
-            (8, 2), (9, 2), (10, 2), (5, 2), (6, 2), (7, 2),  # devices to edge 2
-            (11, 3), (12, 3), (13, 3), (14, 3), (15, 3), (16, 3),  # devices to edge 3
-            (14, 4), (15, 4), (16, 4), (11, 4), (12, 4), (13, 4),  # devices to edge 4
-            # (5, 0), (6, 0), (7, 0), (8, 0), (9, 0), (10, 0), (11, 0), (12, 0), (13, 0), (14, 0), (15, 0), (16, 0),
-            # devices to cloud
+            (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0),  # edge to cloud
+            (7, 1), (8, 1), (9, 1), (10, 1), (11, 1), (12, 1),  # devices to edge 1
+            (7, 2), (8, 2), (9, 2), (10, 2), (11, 2), (12, 2),  # devices to edge 2
+            (7, 3), (8, 3), (9, 3), (10, 3), (11, 3), (12, 3),  # devices to edge 3
+            (13, 4), (14, 4), (15, 4), (16, 4), (17, 4), (18, 4),  # devices to edge 4
+            (13, 5), (14, 5), (15, 5), (16, 5), (17, 5), (18, 5),  # devices to edge 5
+            (13, 6), (14, 6), (15, 6), (16, 6), (17, 6), (18, 6),  # devices to edge 6
 
             (1, 2),  # edge 1 to edge 2
             (2, 1),  # edge 2 to edge 1
@@ -18,8 +18,11 @@ env = {
             (3, 4),  # edge 3 to edge 4
             (4, 3),  # edge 4 to edge 3
 
-            # (1, 4),  # edge 1 to edge 4
-            # (4, 1),  # edge 4 to edge 1
+            (4, 5),  # edge 4 to edge 5
+            (5, 4),  # edge 5 to edge 4
+
+            (5, 6),  # edge 5 to edge 6
+            (6, 5),  # edge 6 to edge 5
         ],
         "bandwidth_device_to_edge": 191,
         "power_device_to_edge": 7.43,
@@ -107,13 +110,13 @@ env = {
         ],
         "nodes": [
             # Devices, Edge, Cloud
-            12, 4, 1
+            12, 6, 1
         ],
         "num_cores": [
             # Cloud
             8,
             # Edge
-            4, 4, 4, 4,
+            4, 4, 4, 4, 4, 4,
             # Devices
             4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
         ]

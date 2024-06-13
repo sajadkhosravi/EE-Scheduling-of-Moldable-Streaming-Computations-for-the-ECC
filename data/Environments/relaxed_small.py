@@ -1,15 +1,16 @@
 env = {
     "network": {
         "network_links": [
-            (1, 0), (2, 0),  # edge to cloud
-            (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1),  # devices to edge 1
-            (3, 2), (4, 2), (5, 2), (6, 2), (7, 2), (8, 2),  # devices to edge 2
+            (1, 0), (2, 0), (3, 0),  # edge to cloud
+            (4, 1), (5, 1), (6, 1), (7, 1), (8, 1), (9, 1),  # devices to edge 1
+            (4, 2), (5, 2), (6, 2), (7, 2), (8, 2), (9, 2),  # devices to edge 2
+            (4, 3), (5, 3), (6, 3), (7, 3), (8, 3), (9, 3),  # devices to edge 3
 
             (1, 2),  # edge 1 to edge 2
             (2, 1),  # edge 2 to edge 1
 
-            # (1, 4),  # edge 1 to edge 4
-            # (4, 1),  # edge 4 to edge 1
+            (2, 3),  # edge 2 to edge 3
+            (3, 2),  # edge 3 to edge 2
         ],
         "bandwidth_device_to_edge": 191,
         "power_device_to_edge": 7.43,
@@ -103,7 +104,7 @@ env = {
             # Cloud
             8,
             # Edge
-            4, 4,
+            4, 4, 4,
             # Devices
             4, 4, 4, 4, 4, 4
         ]
