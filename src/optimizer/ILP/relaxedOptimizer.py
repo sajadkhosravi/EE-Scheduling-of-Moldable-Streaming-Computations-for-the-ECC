@@ -55,7 +55,7 @@ class RelaxedOptimizer(Optimizer):
         raise ValueError("Implausible node pair discovered in bandwidth request.")
 
 
-    def get_node_upload_links_volume(self, node, dest_type):
+    def get_node_outgoing_links_volume(self, node, dest_type):
         # Link exists, determine type of nodes
         if self.get_node_type(node) == 0 and dest_type == 1:
                 # Volume depends on bandwidth and round length
@@ -67,7 +67,7 @@ class RelaxedOptimizer(Optimizer):
             return (self.upload_bandwidth_edge_edge / 8) * self.deadline
         raise ValueError("Implausible node pair discovered in bandwidth request.")
 
-    def get_node_download_links_volume(self, node, src_type):
+    def get_node_incoming_links_volume(self, node, src_type):
         if self.get_node_type(node) == 1 and src_type == 0:
                 # Volume depends on bandwidth and round length
                 # Bandwidth is in MBit/s, deadline in s, volume in MB
@@ -198,33 +198,33 @@ class RelaxedOptimizer(Optimizer):
                 self.opt_model.addConstr(
                         lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r, s)] for v in self.set_U for r, s in self.edges if self.get_node_type(v) == 1 and (u, v) in self.network_links),
                         sense=grb.GRB.LESS_EQUAL,
-                        rhs=self.get_node_upload_links_volume(u, 1),
+                        rhs=self.get_node_outgoing_links_volume(u, 1),
                         name="constraint_upload_bandwidth_device_{0}".format(u)
                     )
             elif self.get_node_type(u) == 2:
                 self.opt_model.addConstr(
                         lhs=grb.quicksum(self.y_vars[v, u, r, s] * self.edge_weights[(r, s)] for v in self.set_U for r, s in self.edges if self.get_node_type(v) == 1 and (v, u) in self.network_links),
                         sense=grb.GRB.LESS_EQUAL,
-                        rhs=self.get_node_download_links_volume(u, 1),
+                        rhs=self.get_node_incoming_links_volume(u, 1),
                         name="constraint_download_bandwidth_cloud_{0}".format(u)
                     )
             elif self.get_node_type(u) == 1:
                 self.opt_model.addConstr(
                         lhs=grb.quicksum(self.y_vars[v, u, r, s] * self.edge_weights[(r, s)] for r, s in self.edges for v in self.set_U if self.get_node_type(v) == 0 and (v, u) in self.network_links),
                         sense=grb.GRB.LESS_EQUAL,
-                        rhs=self.get_node_download_links_volume(u, 0),
+                        rhs=self.get_node_incoming_links_volume(u, 0),
                         name="constraint_download_bandwidth_edge_{0}_from_device".format(u)
                     )
                 self.opt_model.addConstr(
                     lhs=grb.quicksum(self.y_vars[v, u, r, s] * self.edge_weights[(r, s)] for r, s in self.edges for v in self.set_U if self.get_node_type(v) == 1 and v != u and (v, u) in self.network_links),
                     sense=grb.GRB.LESS_EQUAL,
-                    rhs=self.get_node_download_links_volume(u, 1),
+                    rhs=self.get_node_incoming_links_volume(u, 1),
                     name="constraint_download_bandwidth_edge_{0}_from_edge".format(u)
                 )
                 self.opt_model.addConstr(
                     lhs=grb.quicksum(self.y_vars[u, v, r, s] * self.edge_weights[(r, s)] for r, s in self.edges for v in self.set_U if self.get_node_type(v) >= 1 and v != u and (u, v) in self.network_links),
                     sense=grb.GRB.LESS_EQUAL,
-                    rhs=self.get_node_upload_links_volume(u, 1),
+                    rhs=self.get_node_outgoing_links_volume(u, 1),
                     name="constraint_upload_bandwidth_edge_{0}".format(u)
                 )
                 # self.opt_model.addConstr(

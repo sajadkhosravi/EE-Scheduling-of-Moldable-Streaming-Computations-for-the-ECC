@@ -198,7 +198,7 @@ class Optimizer:
         self.deadline = (lower_bound + upper_target) / 2 / self.nodes[0]
         print("Deadline:", self.deadline)
 
-    def get_node_upload_links_volume(self, node, dest_type):
+    def get_node_outgoing_links_volume(self, node, dest_type):
         # Link exists, determine type of nodes
         if self.get_node_type(node) == 0 and dest_type == 1:
                 # Volume depends on bandwidth and round length
@@ -208,7 +208,7 @@ class Optimizer:
             return (self.upload_bandwidth_edge_cloud / 8) * self.deadline
         return 0.0
 
-    def get_node_download_links_volume(self, node, src_type):
+    def get_node_incoming_links_volume(self, node, src_type):
         if self.get_node_type(node) == 1 and src_type == 0:
                 # Volume depends on bandwidth and round length
                 # Bandwidth is in MBit/s, deadline in s, volume in MB

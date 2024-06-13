@@ -53,7 +53,7 @@ class RelaxedHeuristic(Heuristic):
             return (self.bandwidth_edge_to_edge / 8) * deadline
         raise ValueError("Implausible node pair discovered in bandwidth request.")
 
-    def get_node_upload_links_volume(self, node, dest_type):
+    def get_node_outgoing_links_volume(self, node, dest_type):
         # Link exists, determine type of nodes
         if self.get_node_type(node) == 0 and dest_type == 1:
                 # Volume depends on bandwidth and round length
@@ -65,7 +65,7 @@ class RelaxedHeuristic(Heuristic):
             return (self.upload_bandwidth_edge_edge / 8) * self.deadline
         return 0.0
 
-    def get_node_download_links_volume(self, node, src_type):
+    def get_node_incoming_links_volume(self, node, src_type):
         if self.get_node_type(node) == 1 and src_type == 0:
                 # Volume depends on bandwidth and round length
                 # Bandwidth is in MBit/s, deadline in s, volume in MB
