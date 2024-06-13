@@ -108,8 +108,20 @@ class RandomTaskGenerator:
         nx.draw(graph, with_labels=False, arrows=True)
 
         # Save the graph
-        plt.savefig(output_path, format="png", bbox_inches='tight')
+        # plt.savefig(output_path, format="png", bbox_inches='tight')
         plt.close()
+
+    def add_common_sink(self, graphs, last_id):
+
+        for i in range(len(graphs)):
+            for edge in graphs[i]["edges"]:
+                node_content = f"""<edge source="n{last_id + edge["src"]}" target="n{last_id + edge["dest"]}">
+                        <data key="e_data_transfer">{edge["weight"]}</data>
+                    </edge>
+                    """
+                graphml_content = graphml_content.replace('</graph>', node_content + '</graph>', 1)
+            last_id += len(graphs[i]["tasks"])
+
 
     def generate_graph(self, num_instances, num_task_set, num_cores, edge_weight_lbs, edge_weight_ubs, output_path):
         for wi in range(len(edge_weight_lbs)):
@@ -163,16 +175,34 @@ class RandomTaskGenerator:
                             """
                         graphml_content = graphml_content.replace('</graph>', node_content + '</graph>', 1)
                     last_id += len(graphs[i]["tasks"])
+                common_sink_id = last_id
+                node_content = f"""<node id="n{common_sink_id}">
+                                                <data key="v_workload">0</data>
+                                                <data key="v_max_width">1</data>
+                                                <data key="v_task_type">"MEMORY"</data>
+                                                <data key="v_task_name">sink</data>
+                                                <data key="v_instance">{len(graphs)}</data>
+                                            </node>
+                                            """
+                graphml_content = graphml_content.replace('</graph>', node_content + '</graph>', 1)
 
                 last_id = 0
                 for i in range(len(graphs)):
+                    instance_sink_id = 0
                     for edge in graphs[i]["edges"]:
+                        if last_id + edge["dest"] > instance_sink_id:
+                            instance_sink_id = last_id + edge["dest"]
                         node_content = f"""<edge source="n{last_id + edge["src"]}" target="n{last_id + edge["dest"]}">
                                 <data key="e_data_transfer">{edge["weight"]}</data>
                             </edge>
                             """
                         graphml_content = graphml_content.replace('</graph>', node_content + '</graph>', 1)
                     last_id += len(graphs[i]["tasks"])
+                    node_content = f"""<edge source="n{instance_sink_id}" target="n{common_sink_id}">
+                                                    <data key="e_data_transfer">{round(random.uniform(1, 4), 4)}</data>
+                                                </edge>
+                                                """
+                    graphml_content = graphml_content.replace('</graph>', node_content + '</graph>', 1)
 
                 with open(output_path + "graph_ts" + str(num_task_set) + "_task_sets_" + str((wi * num_instances) + instance_id) +".graphml", 'w') as output_file:
                     output_file.write(graphml_content)
