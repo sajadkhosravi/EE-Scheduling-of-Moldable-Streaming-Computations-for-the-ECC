@@ -10,17 +10,17 @@ class Heuristic(Optimizer):
     def __init__(self, task_graph, compute_resource, network_info, execution_time_multipliers, power_info):
         super().__init__(task_graph, compute_resource, network_info, execution_time_multipliers, power_info)
         self.workload_slack = []
-        self.upload_channel_slack = []
-        self.download_channel_slack = []
+        self.outgoing_channel_slack = []
+        self.incoming_channel_slack = []
         self.active_nodes = [0] * sum(self.nodes)
         self.active_nodes[CLOUD_ID] = 1
         self.task_mapping = pd.DataFrame(columns=["Task", "Node", "Core Group", "Frequency", "IsMapped", "Instance"])
 
     def get_node_available_upload_links_volume(self, node, dest_type):
-        return self.upload_channel_slack[node][dest_type]
+        return self.outgoing_channel_slack[node][dest_type]
 
     def get_node_available_download_links_volume(self, node, src_type):
-        return self.download_channel_slack[node][src_type]
+        return self.incoming_channel_slack[node][src_type]
 
     def get_link_volume(self, orig_node, dest_node, deadline):
         if orig_node == dest_node:
@@ -139,24 +139,24 @@ class Heuristic(Optimizer):
             data[group] = self.workload_slack[node][group - 1]
         return sorted(data, key=lambda x: data[x], reverse=True)
 
-    def is_assignable(self, node, core_group, task, predecessors_info, required_time, upload_channel_slack,
-                      download_channel_slack, workload_slack):
+    def is_assignable(self, node, core_group, task, predecessors_info, required_time, outgoing_channel_slack,
+                      incoming_channel_slack, workload_slack):
         workload_assignment_status = True
         channel_assignment_status = True
 
         for i in range(len(predecessors_info)):
             if node == predecessors_info.iloc[i]["Node"]:
                 continue
-            remained_upload_channel_volume = upload_channel_slack[predecessors_info.iloc[i]["Node"]][self.get_node_type(node)] - \
+            remained_outgoing_channel_volume = outgoing_channel_slack[predecessors_info.iloc[i]["Node"]][self.get_node_type(node)] - \
                                              self.edge_weights[(predecessors_info.iloc[i]["Task"], task)]
-            remained_download_channel_volume = download_channel_slack[node][self.get_node_type(predecessors_info.iloc[i]["Node"])] - self.edge_weights[
+            remained_incoming_channel_volume = incoming_channel_slack[node][self.get_node_type(predecessors_info.iloc[i]["Node"])] - self.edge_weights[
                 (predecessors_info.iloc[i]["Task"], task)]
 
-            if remained_upload_channel_volume < 0 or remained_download_channel_volume < 0:
+            if remained_outgoing_channel_volume < 0 or remained_incoming_channel_volume < 0:
                 channel_assignment_status = False
                 break
-            upload_channel_slack[predecessors_info.iloc[i]["Node"]][self.get_node_type(node)] = remained_upload_channel_volume
-            download_channel_slack[node][self.get_node_type(predecessors_info.iloc[i]["Node"])] = remained_download_channel_volume
+            outgoing_channel_slack[predecessors_info.iloc[i]["Node"]][self.get_node_type(node)] = remained_outgoing_channel_volume
+            incoming_channel_slack[node][self.get_node_type(predecessors_info.iloc[i]["Node"])] = remained_incoming_channel_volume
 
         core_groups = [core_group]
         core_groups = core_groups + self.get_parent_core_groups(core_group)
@@ -172,8 +172,8 @@ class Heuristic(Optimizer):
         return workload_assignment_status, channel_assignment_status
 
     def assign(self, node, core_group, task, predecessors_info, frequency_level):
-        temp_upload_channel_slack = self.upload_channel_slack.copy()
-        temp_download_channel_slack = self.download_channel_slack.copy()
+        temp_upload_channel_slack = self.outgoing_channel_slack.copy()
+        temp_download_channel_slack = self.incoming_channel_slack.copy()
         temp_workload_slack = self.workload_slack[node].copy()
 
         required_time = self.get_task_runtime(node, self.cores[node], core_group, self.workloads[task],
@@ -184,8 +184,8 @@ class Heuristic(Optimizer):
                                                              temp_workload_slack)
         if workload_status and channel_status:
             self.workload_slack[node] = temp_workload_slack
-            self.upload_channel_slack = temp_upload_channel_slack
-            self.download_channel_slack = temp_download_channel_slack
+            self.outgoing_channel_slack = temp_upload_channel_slack
+            self.incoming_channel_slack = temp_download_channel_slack
             return True
 
         return False
@@ -200,11 +200,9 @@ class Heuristic(Optimizer):
         for i in core_groups:
             self.workload_slack[node][i - 1] = self.workload_slack[node][i - 1] + required_time
 
-    def get_total_task_energy(self, src_nodes, dest_node, src_tasks, dest_task):
-        core_groups = self.get_core_groups_sorted(dest_node, self.max_widths[dest_task])
-        execution_energy = self.get_task_energy(dest_node, self.cores[dest_node], core_groups[0],
-                                                self.workloads[dest_task], self.max_widths[dest_task],
-                                                self.task_types[dest_task], -1)
+    def get_total_task_energy(self, src_nodes, dest_node, src_tasks, dest_task, core_group):
+        execution_energy = self.get_task_energy(dest_node, self.cores[dest_node], core_group,self.workloads[dest_task],
+                                                self.max_widths[dest_task], self.task_types[dest_task], -1)
 
         comm_energy = 0
         for i in range(len(src_nodes)):
@@ -228,37 +226,38 @@ class Heuristic(Optimizer):
         max_energy = 0
         max_workload = 0
         for node in available_nodes:
-            candidates[node] = {"energy": self.get_total_task_energy(src_nodes, node, src_tasks, dest_task), "available_workload": self.workload_slack[node][0]}
+            core_groups = self.get_core_groups_sorted(node, self.max_widths[dest_task])
+            candidates[node] = {"energy": self.get_total_task_energy(src_nodes, node, src_tasks, dest_task, core_groups[0]), "available_workload": self.workload_slack[node][core_groups[0] - 1]}
             if candidates[node]["energy"] > max_energy:
                 max_energy = candidates[node]["energy"]
             if candidates[node]["available_workload"] > max_workload:
                 max_workload = candidates[node]["available_workload"]
 
         for node in available_nodes:
-            energy = 0
-            available_workload = 0
+            energy_norm = 0
+            available_workload_norm = 0
             if max_energy > 0:
-                energy = candidates[node]["energy"] / max_energy
+                energy_norm = candidates[node]["energy"] / max_energy
             if max_workload > 0:
-                candidates[node]["available_workload"] / max_workload
-            candidates[node] = energy - max_workload
+                available_workload_norm = candidates[node]["available_workload"] / max_workload
+            candidates[node] = energy_norm + available_workload_norm
         return sorted(candidates, key=lambda x: candidates[x])
 
     def slacks_init(self):
         # Initialize channel slack vector
         for u in range(sum(self.nodes)):
-            self.upload_channel_slack.append(
+            self.outgoing_channel_slack.append(
                 [
-                    self.get_node_upload_links_volume(u, 0),
-                    self.get_node_upload_links_volume(u, 1),
-                    self.get_node_upload_links_volume(u, 2),
+                    self.get_node_outgoing_links_volume(u, 0),
+                    self.get_node_outgoing_links_volume(u, 1),
+                    self.get_node_outgoing_links_volume(u, 2),
                 ]
             )
-            self.download_channel_slack.append(
+            self.incoming_channel_slack.append(
                 [
-                    self.get_node_download_links_volume(u, 0),
-                    self.get_node_download_links_volume(u, 1),
-                    self.get_node_download_links_volume(u, 2),
+                    self.get_node_incoming_links_volume(u, 0),
+                    self.get_node_incoming_links_volume(u, 1),
+                    self.get_node_incoming_links_volume(u, 2),
                 ]
             )
 
@@ -275,32 +274,31 @@ class Heuristic(Optimizer):
         current_device = self.nodes[1] + self.nodes[2]
         num_nodes = sum(self.nodes)
 
-        for task in range(0, self.num_tasks):
-            if task in self.source_tasks:
-                core_groups = self.get_core_groups_sorted(current_device, self.max_widths[task])
-                if self.assign(current_device, core_groups[0], task, pd.DataFrame(), -1):
-                    self.task_mapping.loc[len(self.task_mapping)] = [task, current_device, core_groups[0],
-                                                                     self.num_freqs[current_device] - 1, True,
-                                                                     self.instances[task]]
-                    self.active_nodes[current_device] = 1
-                    current_device += 1
-                    if current_device >= num_nodes:
-                        current_device = self.nodes[1] + self.nodes[2]
-                else:
-                    return False
-            elif task in self.sink_tasks:
-                predecessors_info = self.get_predecessor_tasks_mapping_info(task)
-                core_groups = self.get_core_groups_sorted(CLOUD_ID, self.max_widths[task])
-                if self.assign(CLOUD_ID, core_groups[0], task, predecessors_info, -1):
-                    self.task_mapping.loc[len(self.task_mapping)] = [task, CLOUD_ID, core_groups[0],
-                                                                     self.num_freqs[CLOUD_ID] - 1, True,
-                                                                     self.instances[task]]
-                else:
-                    return False
+        for task in self.source_tasks:
+            core_groups = self.get_core_groups_sorted(current_device, self.max_widths[task])
+            if self.assign(current_device, core_groups[0], task, pd.DataFrame(), -1):
+                self.task_mapping.loc[len(self.task_mapping)] = [task, current_device, core_groups[0],
+                                                                 self.num_freqs[current_device] - 1, True,
+                                                                 self.instances[task]]
+                self.active_nodes[current_device] = 1
+                current_device += 1
+                if current_device >= num_nodes:
+                    current_device = self.nodes[1] + self.nodes[2]
+            else:
+                return False
+
+        for task in self.sink_tasks:
+            core_groups = self.get_core_groups_sorted(CLOUD_ID, self.max_widths[task])
+            if self.assign(CLOUD_ID, core_groups[0], task, pd.DataFrame(), -1):
+                self.task_mapping.loc[len(self.task_mapping)] = [task, CLOUD_ID, core_groups[0],
+                                                                 self.num_freqs[CLOUD_ID] - 1, True,
+                                                                 self.instances[task]]
+            else:
+                return False
 
         return True
 
-    def remove_unfeasible_candidates(self, task, mapping_candidates, pred_nodes, pred_tasks):
+    def remove_infeasible_candidates(self, task, mapping_candidates, pred_nodes, pred_tasks):
         feasible_candidates = []
         successor_tasks = self.get_successor_tasks(task)
         sink_successors = [t for t in successor_tasks if t in self.sink_tasks]
@@ -339,7 +337,7 @@ class Heuristic(Optimizer):
                 mapped_tasks = predecessors_mapping_info["Task"].tolist()
 
                 mapping_candidate_nodes = self.get_connected_nodes(mapped_nodes)
-                feasible_candidates = self.remove_unfeasible_candidates(current_task, mapping_candidate_nodes,
+                feasible_candidates = self.remove_infeasible_candidates(current_task, mapping_candidate_nodes,
                                                                         mapped_nodes, mapped_tasks)
                 # mapping_candidate_nodes = self.get_sorted_mapping_candidate(feasible_candidates, mapped_nodes, mapped_tasks, current_task)
                 mapping_candidate_nodes = self.get_sorted_mapping_candidate_by_energy_and_workload(feasible_candidates,
@@ -349,10 +347,13 @@ class Heuristic(Optimizer):
                 is_assigned = False
                 for node in mapping_candidate_nodes:
                     core_groups = self.get_core_groups_sorted(node, self.max_widths[current_task])
-                    if self.assign(node, core_groups[0], current_task, predecessors_mapping_info, -1):
-                        self.task_mapping.loc[len(self.task_mapping)] = [current_task, node, core_groups[0], self.num_freqs[node] - 1, True, self.instances[current_task]]
-                        self.active_nodes[node] = 1
-                        is_assigned = True
+                    for i in core_groups:
+                        if self.assign(node, i, current_task, predecessors_mapping_info, -1):
+                            self.task_mapping.loc[len(self.task_mapping)] = [current_task, node, i, self.num_freqs[node] - 1, True, self.instances[current_task]]
+                            self.active_nodes[node] = 1
+                            is_assigned = True
+                            break
+                    if is_assigned:
                         break
                 if not is_assigned:
                     return False
@@ -489,3 +490,5 @@ class Heuristic(Optimizer):
         overall_energy_consumption.to_csv(output_path + "/consumed_energy.csv")
         active_nodes_df.to_csv(output_path + "/active_nodes.csv")
         edge_mapping.to_csv(output_path + "/edge_mapping.csv")
+
+        return 1
