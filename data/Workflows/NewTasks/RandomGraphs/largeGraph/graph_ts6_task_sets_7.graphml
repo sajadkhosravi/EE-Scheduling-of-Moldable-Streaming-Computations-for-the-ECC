@@ -327,7 +327,7 @@
                                 <data key="v_instance">5</data>
                             </node>
                             <node id="n45">
-                                                <data key="v_workload">0</data>
+                                                <data key="v_workload">1</data>
                                                 <data key="v_max_width">1</data>
                                                 <data key="v_task_type">"MEMORY"</data>
                                                 <data key="v_task_name">sink</data>
