@@ -191,7 +191,7 @@ class Optimizer:
         return comm_duration * power
 
     def compute_deadline(self):
-        cores = self.cores[0]
+        cores = self.cores[len(self.cores) - 1]
         total_workload = sum(self.workloads)
         lower_bound = total_workload / (cores * self.freqs[0][len(self.freqs[0]) - 1])
         upper_target = total_workload / (cores * self.freqs[0][0])

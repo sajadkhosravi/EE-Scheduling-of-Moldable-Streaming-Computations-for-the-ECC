@@ -146,7 +146,7 @@ class DAGGenerator:
 
         common_sink_id = last_id
         node_content = f"""<node id="n{common_sink_id}">
-                                <data key="v_workload">0</data>
+                                <data key="v_workload">1</data>
                                 <data key="v_max_width">1</data>
                                 <data key="v_task_type">"MEMORY"</data>
                                 <data key="v_task_name">sink</data>

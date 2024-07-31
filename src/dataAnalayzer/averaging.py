@@ -1,17 +1,19 @@
 import pandas as pd
 
 task_sets_number = 30
-methods = ["Base", "BaseHeuristic", "Relaxed", "RelaxedHeuristic"]
-task_types = ["Chain", "Independent"]
-env_sizes = ["small", "medium"]
+env_sizes = ["Small", "Medium"]
 deadlines = ["Tight", "Moderate", "Loose"]
-random_graph_sizes = ["large", "medium", "small"]
+methods = ["Strict", "StrictHeuristic", "Relaxed", "RelaxedHeuristic"]
+task_types = ["Random", "RandomDAG"]
+random_task_types = ["RandomChain", "RandomIndependent"]
+randomDAG_graph_sizes = ["large", "medium", "small"]
 
 infeasible_solutions = pd.DataFrame(columns=["Approach", "Task", "Count"])
 for deadline in deadlines:
     for env_size in env_sizes:
-        for type_name in methods:
+        for method in methods:
             for task_type in task_types:
+                rtt = ["RandomDAG"]
                 no_feasible_solution_count = 0
                 timeout_count = 0
                 total_values = {

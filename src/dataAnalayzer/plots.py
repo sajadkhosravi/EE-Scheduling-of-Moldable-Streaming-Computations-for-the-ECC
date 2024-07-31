@@ -97,6 +97,7 @@ def rates_plot_merged(data, x_labels, y_label, legend_labels, colors, output_fil
     plt.savefig(output_file_name, format="png", bbox_inches='tight')
     plt.close()
 
+
 def generate_legend(legend_labels, colors, output_file_name):
     fig = plt.figure()
 
@@ -109,6 +110,7 @@ def generate_legend(legend_labels, colors, output_file_name):
     fig.savefig(output_file_name, dpi='figure', bbox_inches='tight', pad_inches=0)
     plt.close()
 
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Please specify output directory!")
@@ -116,14 +118,16 @@ if __name__ == '__main__':
 
     OUTPUT_PATH = sys.argv[1]
 
-    env_sizes = ["Small", "Medium"]
+    # env_sizes = ["Small", "Medium"]
+    env_sizes = ["Medium"]
     deadlines = ["Tight", "Moderate", "Loose"]
     methods = ["Strict", "Relaxed", "StrictHeuristic", "RelaxedHeuristic"]
-    task_sets = ["Random", "RandomDAG", "SDE"]
+    # task_sets = ["Random", "RandomDAG", "SDE"]
+    task_sets = ["RandomDAG"]
     random_task_sets = ["RandomChain", "RandomIndependent"]
     randomDAG_graph_sizes = ["large", "medium", "small"]
 
-    deadline_df = pd.read_csv(OUTPUT_PATH + '/Deadlines.csv')
+    # deadline_df = pd.read_csv(OUTPUT_PATH + '/Deadlines.csv')
 
     for env_size in env_sizes:
         for task_set in task_sets:
@@ -139,15 +143,16 @@ if __name__ == '__main__':
                             OUTPUT_PATH + '/' + env_size + 'Arch/' + deadlines[deadline_idx] + 'Deadline/' + methods[
                                 method_idx] + '/SDE/consumed_energy.csv')
                         overall_energy_consumptions[deadline_idx].append(energy_consumption.iloc[0]["Overall"])
-                        makespan = deadline_df.loc[deadline_df["Graph"] == "SDE"].loc[
-                            deadline_df["Method"] == methods[method_idx]].loc[deadline_df["EnvSize"] == env_size].iloc[
-                            0]["Avg_" + deadlines[deadline_idx]]
-                        avg_energy_consumptions[deadline_idx].append(energy_consumption.iloc[0]["Overall"] / makespan)
+                        # makespan = deadline_df.loc[deadline_df["DataSet"] == "SDE"].loc[
+                        #     deadline_df["Method"] == methods[method_idx]].loc[deadline_df["Env"] == env_size].iloc[
+                        #     0]["Avg_" + deadlines[deadline_idx]]
 
                         time = pd.read_csv(
                             OUTPUT_PATH + '/' + env_size + 'Arch/' + deadlines[deadline_idx] + 'Deadline/' + methods[
                                 method_idx] + '/SDE/time.csv')
+                        makespan = time.iloc[0]["deadline"]
                         times[deadline_idx].append(time.iloc[0]["Time"])
+                        avg_energy_consumptions[deadline_idx].append(energy_consumption.iloc[0]["Overall"] / makespan)
 
                 plot_merged(overall_energy_consumptions,
                             ["Tight", "Moderate", "Loose"],
@@ -182,27 +187,27 @@ if __name__ == '__main__':
                         for method_idx in range(len(methods)):
                             energy_consumption = pd.read_csv(
                                 OUTPUT_PATH + '/' + env_size + 'Arch/' + deadlines[deadline_idx] + 'Deadline/' +
-                                methods[method_idx] + '/Random/' + random_task_set + '_consumed_energy.csv')
+                                methods[method_idx] + '/Random/' + random_task_set + '_average_consumed_energy.csv')
                             overall_random_energy_consumptions[deadline_idx].append(
                                 energy_consumption.iloc[0]["Overall"])
 
-                            makespan = deadline_df.loc[deadline_df["Graph"] == random_task_set].loc[
-                                deadline_df["Method"] == methods[method_idx]].loc[
-                                deadline_df["EnvSize"] == env_size].iloc[
-                                0]["Avg_" + deadlines[deadline_idx]]
+                            # makespan = deadline_df.loc[deadline_df["DataSet"] == random_task_set].loc[
+                            #     deadline_df["Method"] == methods[method_idx]].loc[
+                            #     deadline_df["Env"] == env_size].iloc[
+                            #     0]["Avg_" + deadlines[deadline_idx]]
                             avg_random_energy_consumptions[deadline_idx].append(
-                                energy_consumption.iloc[0]["Overall"] / makespan)
+                                energy_consumption.iloc[0]["AvgPower"])
 
                             time = pd.read_csv(
                                 OUTPUT_PATH + '/' + env_size + 'Arch/' + deadlines[deadline_idx] + 'Deadline/' +
                                 methods[
-                                    method_idx] + '/Random/' + random_task_set + '_time.csv')
-                            timeout_cases = time.iloc[0]["timeout"]
-                            times[deadline_idx].append(((timeout_cases * 30 * 60) + (time.iloc[0]["Time"] * (30 - timeout_cases))) / 30)
-                            random_rates[deadline_idx].append(
-                                round(((30 - time.iloc[0]["infeasible"] - time.iloc[0]["timeout"]) / 30) * 100))
-                            timeout_rates[deadline_idx].append(round(((time.iloc[0]["timeout"]) / 30) * 100))
-                            infeasible_rates[deadline_idx].append(round(((time.iloc[0]["infeasible"]) / 30) * 100))
+                                    method_idx] + '/Random/' + random_task_set + '_average_time.csv')
+                            # timeout_cases = time.iloc[0]["timeout"]
+                            times[deadline_idx].append(time.iloc[0]["Time"])
+                            # random_rates[deadline_idx].append(
+                            #     round(((30 - time.iloc[0]["infeasible"] - time.iloc[0]["timeout"]) / 30) * 100))
+                            # timeout_rates[deadline_idx].append(round(((time.iloc[0]["timeout"]) / 30) * 100))
+                            # infeasible_rates[deadline_idx].append(round(((time.iloc[0]["infeasible"]) / 30) * 100))
 
                     plot_merged(overall_random_energy_consumptions,
                                 ["Tight", "Moderate", "Loose"],
@@ -218,26 +223,26 @@ if __name__ == '__main__':
                                 ["darkred", "red", "tomato", "orange"],
                                 OUTPUT_PATH + '/charts/' + env_size + 'Arch/Random/' + random_task_set + '_average_energy_comparison.png')
 
-                    rates_plot_merged(random_rates,
-                                      ["Tight", "Moderate", "Loose"],
-                                      'Success Rate',
-                                      ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
-                                      ["darkred", "red", "tomato", "orange"],
-                                      OUTPUT_PATH + '/charts/' + env_size + "Arch/Random/" + random_task_set + "_success_rate.png")
-
-                    rates_plot_merged(timeout_rates,
-                                      ["Tight", "Moderate", "Loose"],
-                                      'Timeout Rate',
-                                      ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
-                                      ["darkred", "red", "tomato", "orange"],
-                                      OUTPUT_PATH + '/charts/' + env_size + "Arch/Random/" + random_task_set + "_timeout_rate.png")
-
-                    rates_plot_merged(infeasible_rates,
-                                      ["Tight", "Moderate", "Loose"],
-                                      'Infeasible Programs Rate',
-                                      ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
-                                      ["darkred", "red", "tomato", "orange"],
-                                      OUTPUT_PATH + '/charts/' + env_size + "Arch/Random/" + random_task_set + "_infeasible_rate.png")
+                    # rates_plot_merged(random_rates,
+                    #                   ["Tight", "Moderate", "Loose"],
+                    #                   'Success Rate',
+                    #                   ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
+                    #                   ["darkred", "red", "tomato", "orange"],
+                    #                   OUTPUT_PATH + '/charts/' + env_size + "Arch/Random/" + random_task_set + "_success_rate.png")
+                    #
+                    # rates_plot_merged(timeout_rates,
+                    #                   ["Tight", "Moderate", "Loose"],
+                    #                   'Timeout Rate',
+                    #                   ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
+                    #                   ["darkred", "red", "tomato", "orange"],
+                    #                   OUTPUT_PATH + '/charts/' + env_size + "Arch/Random/" + random_task_set + "_timeout_rate.png")
+                    #
+                    # rates_plot_merged(infeasible_rates,
+                    #                   ["Tight", "Moderate", "Loose"],
+                    #                   'Infeasible Programs Rate',
+                    #                   ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
+                    #                   ["darkred", "red", "tomato", "orange"],
+                    #                   OUTPUT_PATH + '/charts/' + env_size + "Arch/Random/" + random_task_set + "_infeasible_rate.png")
 
                     plot_merged(times,
                                 ["Tight", "Moderate", "Loose"],
@@ -247,6 +252,8 @@ if __name__ == '__main__':
                                 OUTPUT_PATH + '/charts/' + env_size + "Arch/Random/" + random_task_set + "_overall_time_comparison.png")
 
             elif task_set == "RandomDAG":
+
+                performance_df = pd.read_csv(OUTPUT_PATH + "/performance.csv")
                 for graph_size in randomDAG_graph_sizes:
                     times = [[], [], []]
                     overall_random_energy_consumptions = [[], [], []]
@@ -261,26 +268,30 @@ if __name__ == '__main__':
                                 OUTPUT_PATH + '/' + env_size + 'Arch/' + deadlines[deadline_idx] + 'Deadline/' +
                                 methods[
                                     method_idx] + '/RandomDAG/' + graph_size + 'Graph/Average_consumed_energy.csv')
-                            overall_random_energy_consumptions[deadline_idx].append(energy_consumption.iloc[0]["Overall"])
+                            overall_random_energy_consumptions[deadline_idx].append(
+                                energy_consumption.iloc[0]["Overall"])
 
-                            makespan = deadline_df.loc[deadline_df["Graph"] == "RandomDAG"].loc[
-                                deadline_df["GraphSize"] == graph_size].loc[
-                                deadline_df["Method"] == methods[method_idx]].loc[
-                                deadline_df["EnvSize"] == env_size].iloc[
-                                0]["Avg_" + deadlines[deadline_idx]]
+                            # makespan = deadline_df.loc[deadline_df["DataSet"] == "RandomDAG"].loc[
+                            #     deadline_df["GraphSize"] == graph_size].loc[
+                            #     deadline_df["Method"] == methods[method_idx]].loc[
+                            #     deadline_df["Env"] == env_size].iloc[
+                            #     0]["Avg_" + deadlines[deadline_idx]]
                             avg_random_energy_consumptions[deadline_idx].append(
-                                energy_consumption.iloc[0]["Overall"] / makespan)
+                                energy_consumption.iloc[0]["AvgPower"])
 
                             time = pd.read_csv(
                                 OUTPUT_PATH + '/' + env_size + 'Arch/' + deadlines[deadline_idx] + 'Deadline/' +
                                 methods[
-                                    method_idx] + '/RandomDAG/' + graph_size + 'Graph/Average_time.csv')
-                            timeout_cases = time.iloc[0]["timeout"]
-                            times[deadline_idx].append(((timeout_cases * 30 * 60) + (time.iloc[0]["Time"] * (30 - timeout_cases))) / 30)
-                            random_rates[deadline_idx].append(
-                                round(((30 - time.iloc[0]["infeasible"] - time.iloc[0]["timeout"]) / 30) * 100))
-                            timeout_rates[deadline_idx].append(round(((time.iloc[0]["timeout"]) / 30) * 100))
-                            infeasible_rates[deadline_idx].append(round(((time.iloc[0]["infeasible"]) / 30) * 100))
+                                    method_idx] + '/RandomDAG/' + graph_size + 'Graph/RandomDAG_average_time.csv')
+                            # timeout_cases = time.iloc[0]["timeout"]
+                            times[deadline_idx].append(time.iloc[0]["Time"])
+                            performance_result = performance_df.loc[performance_df["Env"] == env_size].loc[
+                                performance_df["Deadline"] == deadlines[deadline_idx]].loc[
+                                performance_df["Method"] == methods[method_idx]].loc[
+                                performance_df["DataSet"] == task_set].loc[performance_df["GraphSize"] == graph_size]
+                            random_rates[deadline_idx].append(round((performance_result.iloc[0]["Success"] / 20) * 100))
+                            timeout_rates[deadline_idx].append(round((performance_result.iloc[0]["Timeout"] / 20) * 100))
+                            infeasible_rates[deadline_idx].append(round((performance_result.iloc[0]["Infeasible"] / 20) * 100))
 
                     plot_merged(overall_random_energy_consumptions,
                                 ["Tight", "Moderate", "Loose"],
@@ -302,7 +313,7 @@ if __name__ == '__main__':
                                       ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
                                       ["darkred", "red", "tomato", "orange"],
                                         OUTPUT_PATH + '/charts/' + env_size + 'Arch/RandomDAG/' + graph_size + "_success_rate.png")
-
+                    #
                     rates_plot_merged(timeout_rates,
                                       ["Tight", "Moderate", "Loose"],
                                       'Timeout Rate',
@@ -316,13 +327,29 @@ if __name__ == '__main__':
                                       ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
                                       ["darkred", "red", "tomato", "orange"],
                                            OUTPUT_PATH + '/charts/' + env_size + 'Arch/RandomDAG/' + graph_size + "_infeasible_rate.png")
-
+                    #
                     plot_merged(times,
                                 ["Tight", "Moderate", "Loose"],
                                 'Optimization Time (S)',
                                 ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
                                 ["darkred", "red", "tomato", "orange"],
-                                     OUTPUT_PATH + '/charts/' + env_size + 'Arch/RandomDAG/' + graph_size + "_overall_time_comparison.png")
+                                OUTPUT_PATH + '/charts/' + env_size + 'Arch/RandomDAG/' + graph_size + "_overall_time_comparison.png")
 
     generate_legend(["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
-                                ["darkred", "red", "tomato", "orange"],  OUTPUT_PATH + '/charts/legend.png')
+                    ["darkred", "red", "tomato", "orange"], OUTPUT_PATH + '/charts/legend.png')
+
+
+    plot_merged([[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 504.50, 0.0], [0.0, 0.0, 472.14, 479.62]],
+                                    ["Tight", "Moderate", "Loose"],
+                                    'Average Power',
+                                    ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
+                                    ["darkred", "red", "tomato", "orange"],
+                                    OUTPUT_PATH + '/charts/LargeArch/large_average_energy_comparison.png')
+
+
+    plot_merged([[0.0, 0.0, 0.50, 1.10], [0.0, 0.0, 3.55, 3.04], [0.0, 0.0, 2.64, 5.58]],
+                                    ["Tight", "Moderate", "Loose"],
+                                    'Optimization Time (S)',
+                                    ["ILP\nStrict", "ILP\nRelaxed", "Heuristic\nStrict", "Heuristic\nRelaxed"],
+                                    ["darkred", "red", "tomato", "orange"],
+                                    OUTPUT_PATH + '/charts/LargeArch/large_overall_time_comparison.png')

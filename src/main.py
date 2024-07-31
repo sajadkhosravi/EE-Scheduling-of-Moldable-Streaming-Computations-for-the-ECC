@@ -65,7 +65,7 @@ if __name__ == '__main__':
     if status != -1:
         status = optimizer.generate_result(output_path)
 
-    time_dict = {"Time": [end_time - start_time], "status": status}
+    time_dict = {"Time": [end_time - start_time], "status": status, "deadline": optimizer.deadline}
     time_df = pd.DataFrame(time_dict)
 
     time_df.to_csv(output_path + "/time.csv")
