@@ -14,335 +14,363 @@
                       <node id="n0">
                                 <data key="v_workload">3</data>
                                 <data key="v_max_width">1</data>
-                                <data key="v_task_type">SIMD</data>
+                                <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task0</data>
                                 <data key="v_instance">0</data>
                             </node>
                             <node id="n1">
-                                <data key="v_workload">72</data>
-                                <data key="v_max_width">2</data>
-                                <data key="v_task_type">MEMORY</data>
+                                <data key="v_workload">49</data>
+                                <data key="v_max_width">1</data>
+                                <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task1</data>
                                 <data key="v_instance">0</data>
                             </node>
                             <node id="n2">
-                                <data key="v_workload">5</data>
+                                <data key="v_workload">41</data>
                                 <data key="v_max_width">4</data>
                                 <data key="v_task_type">FMULT</data>
                                 <data key="v_task_name">task2</data>
                                 <data key="v_instance">0</data>
                             </node>
                             <node id="n3">
-                                <data key="v_workload">36</data>
+                                <data key="v_workload">95</data>
                                 <data key="v_max_width">2</data>
                                 <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task3</data>
                                 <data key="v_instance">0</data>
                             </node>
                             <node id="n4">
-                                <data key="v_workload">45</data>
-                                <data key="v_max_width">1</data>
-                                <data key="v_task_type">MEMORY</data>
+                                <data key="v_workload">83</data>
+                                <data key="v_max_width">4</data>
+                                <data key="v_task_type">FMULT</data>
                                 <data key="v_task_name">task4</data>
                                 <data key="v_instance">0</data>
                             </node>
                             <node id="n5">
-                                <data key="v_workload">3</data>
-                                <data key="v_max_width">2</data>
-                                <data key="v_task_type">SIMD</data>
+                                <data key="v_workload">7</data>
+                                <data key="v_max_width">1</data>
+                                <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task0</data>
                                 <data key="v_instance">1</data>
                             </node>
                             <node id="n6">
-                                <data key="v_workload">99</data>
+                                <data key="v_workload">55</data>
                                 <data key="v_max_width">4</data>
                                 <data key="v_task_type">FMULT</data>
                                 <data key="v_task_name">task1</data>
                                 <data key="v_instance">1</data>
                             </node>
                             <node id="n7">
-                                <data key="v_workload">24</data>
-                                <data key="v_max_width">1</data>
+                                <data key="v_workload">37</data>
+                                <data key="v_max_width">4</data>
                                 <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task2</data>
                                 <data key="v_instance">1</data>
                             </node>
                             <node id="n8">
-                                <data key="v_workload">78</data>
-                                <data key="v_max_width">4</data>
-                                <data key="v_task_type">SIMD</data>
+                                <data key="v_workload">27</data>
+                                <data key="v_max_width">2</data>
+                                <data key="v_task_type">FMULT</data>
                                 <data key="v_task_name">task3</data>
                                 <data key="v_instance">1</data>
                             </node>
                             <node id="n9">
-                                <data key="v_workload">87</data>
-                                <data key="v_max_width">2</data>
-                                <data key="v_task_type">FMULT</data>
+                                <data key="v_workload">25</data>
+                                <data key="v_max_width">4</data>
+                                <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task4</data>
                                 <data key="v_instance">1</data>
                             </node>
                             <node id="n10">
-                                <data key="v_workload">7</data>
-                                <data key="v_max_width">1</data>
-                                <data key="v_task_type">MEMORY</data>
+                                <data key="v_workload">1</data>
+                                <data key="v_max_width">2</data>
+                                <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task0</data>
                                 <data key="v_instance">2</data>
                             </node>
                             <node id="n11">
-                                <data key="v_workload">35</data>
+                                <data key="v_workload">70</data>
                                 <data key="v_max_width">4</data>
                                 <data key="v_task_type">FMULT</data>
                                 <data key="v_task_name">task1</data>
                                 <data key="v_instance">2</data>
                             </node>
                             <node id="n12">
-                                <data key="v_workload">20</data>
-                                <data key="v_max_width">2</data>
+                                <data key="v_workload">15</data>
+                                <data key="v_max_width">4</data>
                                 <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task2</data>
                                 <data key="v_instance">2</data>
                             </node>
                             <node id="n13">
-                                <data key="v_workload">84</data>
+                                <data key="v_workload">90</data>
                                 <data key="v_max_width">4</data>
                                 <data key="v_task_type">FMULT</data>
                                 <data key="v_task_name">task3</data>
                                 <data key="v_instance">2</data>
                             </node>
                             <node id="n14">
-                                <data key="v_workload">49</data>
-                                <data key="v_max_width">1</data>
-                                <data key="v_task_type">SIMD</data>
+                                <data key="v_workload">66</data>
+                                <data key="v_max_width">2</data>
+                                <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task4</data>
                                 <data key="v_instance">2</data>
                             </node>
                             <node id="n15">
-                                <data key="v_workload">5</data>
+                                <data key="v_workload">4</data>
                                 <data key="v_max_width">4</data>
-                                <data key="v_task_type">MEMORY</data>
+                                <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task0</data>
                                 <data key="v_instance">3</data>
                             </node>
                             <node id="n16">
-                                <data key="v_workload">13</data>
-                                <data key="v_max_width">1</data>
-                                <data key="v_task_type">FMULT</data>
+                                <data key="v_workload">3</data>
+                                <data key="v_max_width">2</data>
+                                <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task1</data>
                                 <data key="v_instance">3</data>
                             </node>
                             <node id="n17">
-                                <data key="v_workload">43</data>
-                                <data key="v_max_width">4</data>
+                                <data key="v_workload">22</data>
+                                <data key="v_max_width">1</data>
                                 <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task2</data>
                                 <data key="v_instance">3</data>
                             </node>
                             <node id="n18">
-                                <data key="v_workload">6</data>
+                                <data key="v_workload">91</data>
                                 <data key="v_max_width">2</data>
                                 <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task3</data>
                                 <data key="v_instance">3</data>
                             </node>
                             <node id="n19">
-                                <data key="v_workload">95</data>
-                                <data key="v_max_width">2</data>
-                                <data key="v_task_type">SIMD</data>
+                                <data key="v_workload">80</data>
+                                <data key="v_max_width">4</data>
+                                <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task4</data>
                                 <data key="v_instance">3</data>
                             </node>
                             <node id="n20">
-                                <data key="v_workload">36</data>
+                                <data key="v_workload">5</data>
                                 <data key="v_max_width">1</data>
-                                <data key="v_task_type">MEMORY</data>
+                                <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task5</data>
                                 <data key="v_instance">3</data>
                             </node>
                             <node id="n21">
                                 <data key="v_workload">10</data>
-                                <data key="v_max_width">2</data>
-                                <data key="v_task_type">FMULT</data>
+                                <data key="v_max_width">1</data>
+                                <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task0</data>
                                 <data key="v_instance">4</data>
                             </node>
                             <node id="n22">
-                                <data key="v_workload">31</data>
-                                <data key="v_max_width">2</data>
+                                <data key="v_workload">33</data>
+                                <data key="v_max_width">4</data>
                                 <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task1</data>
                                 <data key="v_instance">4</data>
                             </node>
                             <node id="n23">
                                 <data key="v_workload">30</data>
-                                <data key="v_max_width">1</data>
-                                <data key="v_task_type">FMULT</data>
+                                <data key="v_max_width">2</data>
+                                <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task2</data>
                                 <data key="v_instance">4</data>
                             </node>
                             <node id="n24">
-                                <data key="v_workload">8</data>
-                                <data key="v_max_width">2</data>
-                                <data key="v_task_type">MEMORY</data>
+                                <data key="v_workload">59</data>
+                                <data key="v_max_width">4</data>
+                                <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task3</data>
                                 <data key="v_instance">4</data>
                             </node>
                             <node id="n25">
-                                <data key="v_workload">88</data>
-                                <data key="v_max_width">4</data>
-                                <data key="v_task_type">FMULT</data>
+                                <data key="v_workload">17</data>
+                                <data key="v_max_width">2</data>
+                                <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task4</data>
                                 <data key="v_instance">4</data>
                             </node>
                             <node id="n26">
-                                <data key="v_workload">70</data>
-                                <data key="v_max_width">2</data>
-                                <data key="v_task_type">FMULT</data>
+                                <data key="v_workload">64</data>
+                                <data key="v_max_width">4</data>
+                                <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task5</data>
                                 <data key="v_instance">4</data>
                             </node>
                             <node id="n27">
-                                <data key="v_workload">10</data>
-                                <data key="v_max_width">1</data>
+                                <data key="v_workload">1</data>
+                                <data key="v_max_width">4</data>
                                 <data key="v_task_type">FMULT</data>
                                 <data key="v_task_name">task0</data>
                                 <data key="v_instance">5</data>
                             </node>
                             <node id="n28">
-                                <data key="v_workload">43</data>
-                                <data key="v_max_width">1</data>
-                                <data key="v_task_type">FMULT</data>
+                                <data key="v_workload">69</data>
+                                <data key="v_max_width">4</data>
+                                <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task1</data>
                                 <data key="v_instance">5</data>
                             </node>
                             <node id="n29">
-                                <data key="v_workload">96</data>
-                                <data key="v_max_width">4</data>
-                                <data key="v_task_type">FMULT</data>
+                                <data key="v_workload">8</data>
+                                <data key="v_max_width">1</data>
+                                <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task2</data>
                                 <data key="v_instance">5</data>
                             </node>
                             <node id="n30">
-                                <data key="v_workload">15</data>
-                                <data key="v_max_width">2</data>
+                                <data key="v_workload">38</data>
+                                <data key="v_max_width">1</data>
                                 <data key="v_task_type">SIMD</data>
                                 <data key="v_task_name">task3</data>
                                 <data key="v_instance">5</data>
                             </node>
                             <node id="n31">
-                                <data key="v_workload">90</data>
-                                <data key="v_max_width">4</data>
-                                <data key="v_task_type">MEMORY</data>
+                                <data key="v_workload">16</data>
+                                <data key="v_max_width">2</data>
+                                <data key="v_task_type">FMULT</data>
                                 <data key="v_task_name">task4</data>
                                 <data key="v_instance">5</data>
                             </node>
                             <node id="n32">
-                                <data key="v_workload">41</data>
-                                <data key="v_max_width">2</data>
-                                <data key="v_task_type">FMULT</data>
+                                <data key="v_workload">3</data>
+                                <data key="v_max_width">4</data>
+                                <data key="v_task_type">MEMORY</data>
                                 <data key="v_task_name">task5</data>
                                 <data key="v_instance">5</data>
                             </node>
-                            <edge source="n1" target="n4">
-                                <data key="e_data_transfer">4.4318</data>
+                            <node id="n33">
+                                                <data key="v_workload">1</data>
+                                                <data key="v_max_width">1</data>
+                                                <data key="v_task_type">"MEMORY"</data>
+                                                <data key="v_task_name">sink</data>
+                                                <data key="v_instance">6</data>
+                                            </node>
+                                            <edge source="n1" target="n2">
+                                <data key="e_data_transfer">1.692</data>
                             </edge>
-                            <edge source="n2" target="n3">
-                                <data key="e_data_transfer">3.6609</data>
+                            <edge source="n2" target="n4">
+                                <data key="e_data_transfer">1.542</data>
                             </edge>
                             <edge source="n3" target="n4">
-                                <data key="e_data_transfer">1.0385</data>
+                                <data key="e_data_transfer">2.8609</data>
                             </edge>
                             <edge source="n0" target="n1">
-                                <data key="e_data_transfer">8.535</data>
+                                <data key="e_data_transfer">2.2065</data>
                             </edge>
-                            <edge source="n0" target="n2">
-                                <data key="e_data_transfer">6.3385</data>
+                            <edge source="n0" target="n3">
+                                <data key="e_data_transfer">3.0231</data>
                             </edge>
-                            <edge source="n6" target="n9">
-                                <data key="e_data_transfer">1.7578</data>
+                            <edge source="n4" target="n33">
+                                                    <data key="e_data_transfer">1.5259</data>
+                                                </edge>
+                                                <edge source="n6" target="n9">
+                                <data key="e_data_transfer">2.1224</data>
                             </edge>
-                            <edge source="n7" target="n9">
-                                <data key="e_data_transfer">9.5034</data>
+                            <edge source="n7" target="n6">
+                                <data key="e_data_transfer">1.8347</data>
                             </edge>
-                            <edge source="n8" target="n6">
-                                <data key="e_data_transfer">2.8392</data>
+                            <edge source="n8" target="n9">
+                                <data key="e_data_transfer">1.79</data>
                             </edge>
                             <edge source="n5" target="n7">
-                                <data key="e_data_transfer">8.8884</data>
+                                <data key="e_data_transfer">3.569</data>
                             </edge>
                             <edge source="n5" target="n8">
-                                <data key="e_data_transfer">2.2848</data>
+                                <data key="e_data_transfer">3.9821</data>
                             </edge>
-                            <edge source="n11" target="n12">
-                                <data key="e_data_transfer">6.4987</data>
+                            <edge source="n9" target="n33">
+                                                    <data key="e_data_transfer">1.7116</data>
+                                                </edge>
+                                                <edge source="n11" target="n14">
+                                <data key="e_data_transfer">4.4835</data>
                             </edge>
                             <edge source="n12" target="n14">
-                                <data key="e_data_transfer">9.5086</data>
+                                <data key="e_data_transfer">4.0531</data>
                             </edge>
                             <edge source="n13" target="n11">
-                                <data key="e_data_transfer">7.3188</data>
+                                <data key="e_data_transfer">3.1744</data>
+                            </edge>
+                            <edge source="n13" target="n12">
+                                <data key="e_data_transfer">2.3734</data>
                             </edge>
                             <edge source="n10" target="n13">
-                                <data key="e_data_transfer">1.4514</data>
+                                <data key="e_data_transfer">4.6901</data>
                             </edge>
-                            <edge source="n16" target="n20">
-                                <data key="e_data_transfer">8.9728</data>
+                            <edge source="n14" target="n33">
+                                                    <data key="e_data_transfer">2.0628</data>
+                                                </edge>
+                                                <edge source="n16" target="n20">
+                                <data key="e_data_transfer">1.7037</data>
                             </edge>
                             <edge source="n17" target="n18">
-                                <data key="e_data_transfer">1.4559</data>
+                                <data key="e_data_transfer">2.3973</data>
                             </edge>
-                            <edge source="n18" target="n16">
-                                <data key="e_data_transfer">1.0741</data>
+                            <edge source="n18" target="n20">
+                                <data key="e_data_transfer">2.431</data>
                             </edge>
-                            <edge source="n19" target="n16">
-                                <data key="e_data_transfer">8.7493</data>
+                            <edge source="n19" target="n20">
+                                <data key="e_data_transfer">1.6664</data>
+                            </edge>
+                            <edge source="n15" target="n16">
+                                <data key="e_data_transfer">2.1689</data>
                             </edge>
                             <edge source="n15" target="n17">
-                                <data key="e_data_transfer">5.6473</data>
+                                <data key="e_data_transfer">1.6144</data>
                             </edge>
                             <edge source="n15" target="n19">
-                                <data key="e_data_transfer">7.539</data>
+                                <data key="e_data_transfer">4.8376</data>
                             </edge>
-                            <edge source="n22" target="n24">
-                                <data key="e_data_transfer">3.658</data>
+                            <edge source="n20" target="n33">
+                                                    <data key="e_data_transfer">1.268</data>
+                                                </edge>
+                                                <edge source="n22" target="n23">
+                                <data key="e_data_transfer">4.9341</data>
                             </edge>
                             <edge source="n22" target="n25">
-                                <data key="e_data_transfer">2.1491</data>
+                                <data key="e_data_transfer">1.0063</data>
                             </edge>
-                            <edge source="n23" target="n26">
-                                <data key="e_data_transfer">8.5677</data>
+                            <edge source="n23" target="n24">
+                                <data key="e_data_transfer">4.9509</data>
                             </edge>
-                            <edge source="n24" target="n25">
-                                <data key="e_data_transfer">7.1292</data>
+                            <edge source="n24" target="n26">
+                                <data key="e_data_transfer">1.1204</data>
                             </edge>
-                            <edge source="n25" target="n26">
-                                <data key="e_data_transfer">6.0119</data>
+                            <edge source="n25" target="n23">
+                                <data key="e_data_transfer">2.9554</data>
                             </edge>
                             <edge source="n21" target="n22">
-                                <data key="e_data_transfer">1.7608</data>
+                                <data key="e_data_transfer">2.0141</data>
                             </edge>
-                            <edge source="n21" target="n23">
-                                <data key="e_data_transfer">9.3689</data>
-                            </edge>
-                            <edge source="n28" target="n29">
-                                <data key="e_data_transfer">5.9907</data>
-                            </edge>
-                            <edge source="n28" target="n30">
-                                <data key="e_data_transfer">1.9466</data>
-                            </edge>
-                            <edge source="n28" target="n31">
-                                <data key="e_data_transfer">1.0841</data>
+                            <edge source="n26" target="n33">
+                                                    <data key="e_data_transfer">2.0904</data>
+                                                </edge>
+                                                <edge source="n28" target="n29">
+                                <data key="e_data_transfer">4.4966</data>
                             </edge>
                             <edge source="n29" target="n32">
-                                <data key="e_data_transfer">3.6952</data>
+                                <data key="e_data_transfer">1.9457</data>
+                            </edge>
+                            <edge source="n30" target="n28">
+                                <data key="e_data_transfer">2.1085</data>
                             </edge>
                             <edge source="n30" target="n29">
-                                <data key="e_data_transfer">3.4839</data>
+                                <data key="e_data_transfer">2.1983</data>
                             </edge>
-                            <edge source="n31" target="n29">
-                                <data key="e_data_transfer">2.5006</data>
+                            <edge source="n31" target="n28">
+                                <data key="e_data_transfer">4.5454</data>
                             </edge>
-                            <edge source="n27" target="n28">
-                                <data key="e_data_transfer">9.8868</data>
+                            <edge source="n27" target="n30">
+                                <data key="e_data_transfer">3.1587</data>
                             </edge>
-                            </graph>
+                            <edge source="n27" target="n31">
+                                <data key="e_data_transfer">3.6187</data>
+                            </edge>
+                            <edge source="n32" target="n33">
+                                                    <data key="e_data_transfer">1.226</data>
+                                                </edge>
+                                                </graph>
                     </graphml>

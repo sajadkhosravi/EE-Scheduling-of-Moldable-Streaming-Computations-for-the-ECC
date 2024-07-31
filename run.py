@@ -16,342 +16,54 @@ def optimization(method, input_path, output_path, env_size, lb, ub, graph_type, 
 known_graph_tasks = [
     {
         "graph_type": "RandomChain",
-        "env_size": "small",
-        "input_temp": "chain_5_tasks_6_task_sets_random_graph_small_data_",
+        "env_size": "Small",
+        "input_temp": "graph_ts6_task_sets_",
         "lb": 0,
-        "ub": 10,
-        "method_types": ["Strict"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "small",
-        "input_temp": "chain_5_tasks_6_task_sets_random_graph_medium_data_",
-        "lb": 10,
         "ub": 20,
-        "method_types": ["Strict"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "small",
-        "input_temp": "chain_5_tasks_6_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["Strict"]
+        "method_types": ["Strict", "StrictHeuristic", "RelaxedHeuristic", "Relaxed"]
     },
     {
         "graph_type": "RandomIndependent",
-        "env_size": "small",
-        "input_temp": "independent_5_tasks_6_task_sets_random_graph_small_data_",
+        "env_size": "Small",
+        "input_temp": "graph_ts6_task_sets_",
         "lb": 0,
-        "ub": 10,
-        "method_types": ["Strict"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "small",
-        "input_temp": "independent_5_tasks_6_task_sets_random_graph_medium_data_",
-        "lb": 10,
         "ub": 20,
-        "method_types": ["Strict"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "small",
-        "input_temp": "independent_5_tasks_6_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["Strict"]
+        "method_types": ["Strict", "StrictHeuristic", "RelaxedHeuristic", "Relaxed"]
     },
     {
         "graph_type": "RandomChain",
-        "env_size": "small",
-        "input_temp": "chain_5_tasks_6_task_sets_random_graph_small_data_",
+        "env_size": "Medium",
+        "input_temp": "graph_ts12_task_sets_",
         "lb": 0,
-        "ub": 10,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "small",
-        "input_temp": "chain_5_tasks_6_task_sets_random_graph_medium_data_",
-        "lb": 10,
         "ub": 20,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "small",
-        "input_temp": "chain_5_tasks_6_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
+        "method_types": ["Strict", "StrictHeuristic", "RelaxedHeuristic", "Relaxed"]
     },
     {
         "graph_type": "RandomIndependent",
-        "env_size": "small",
-        "input_temp": "independent_5_tasks_6_task_sets_random_graph_small_data_",
+        "env_size": "Medium",
+        "input_temp": "graph_ts12_task_sets_",
         "lb": 0,
-        "ub": 10,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "small",
-        "input_temp": "independent_5_tasks_6_task_sets_random_graph_medium_data_",
-        "lb": 10,
         "ub": 20,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "small",
-        "input_temp": "independent_5_tasks_6_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "small",
-        "input_temp": "chain_5_tasks_6_task_sets_random_graph_small_data_",
-        "lb": 0,
-        "ub": 10,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "small",
-        "input_temp": "chain_5_tasks_6_task_sets_random_graph_medium_data_",
-        "lb": 10,
-        "ub": 20,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "small",
-        "input_temp": "chain_5_tasks_6_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "small",
-        "input_temp": "independent_5_tasks_6_task_sets_random_graph_small_data_",
-        "lb": 0,
-        "ub": 10,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "small",
-        "input_temp": "independent_5_tasks_6_task_sets_random_graph_medium_data_",
-        "lb": 10,
-        "ub": 20,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "small",
-        "input_temp": "independent_5_tasks_6_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "medium",
-        "input_temp": "chain_5_tasks_12_task_sets_random_graph_small_data_",
-        "lb": 0,
-        "ub": 10,
-        "method_types": ["Strict"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "medium",
-        "input_temp": "chain_5_tasks_12_task_sets_random_graph_medium_data_",
-        "lb": 10,
-        "ub": 20,
-        "method_types": ["Strict"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "medium",
-        "input_temp": "chain_5_tasks_12_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["Strict"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "medium",
-        "input_temp": "independent_5_tasks_12_task_sets_random_graph_small_data_",
-        "lb": 0,
-        "ub": 10,
-        "method_types": ["Strict"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "medium",
-        "input_temp": "independent_5_tasks_12_task_sets_random_graph_medium_data_",
-        "lb": 10,
-        "ub": 20,
-        "method_types": ["Strict"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "medium",
-        "input_temp": "independent_5_tasks_12_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["Strict"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "medium",
-        "input_temp": "chain_5_tasks_12_task_sets_random_graph_small_data_",
-        "lb": 0,
-        "ub": 10,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "medium",
-        "input_temp": "chain_5_tasks_12_task_sets_random_graph_medium_data_",
-        "lb": 10,
-        "ub": 20,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "medium",
-        "input_temp": "chain_5_tasks_12_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "medium",
-        "input_temp": "independent_5_tasks_12_task_sets_random_graph_small_data_",
-        "lb": 0,
-        "ub": 10,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "medium",
-        "input_temp": "independent_5_tasks_12_task_sets_random_graph_medium_data_",
-        "lb": 10,
-        "ub": 20,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "medium",
-        "input_temp": "independent_5_tasks_12_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "medium",
-        "input_temp": "chain_5_tasks_12_task_sets_random_graph_small_data_",
-        "lb": 0,
-        "ub": 10,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "medium",
-        "input_temp": "chain_5_tasks_12_task_sets_random_graph_medium_data_",
-        "lb": 10,
-        "ub": 20,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomChain",
-        "env_size": "medium",
-        "input_temp": "chain_5_tasks_12_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "medium",
-        "input_temp": "independent_5_tasks_12_task_sets_random_graph_small_data_",
-        "lb": 0,
-        "ub": 10,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "medium",
-        "input_temp": "independent_5_tasks_12_task_sets_random_graph_medium_data_",
-        "lb": 10,
-        "ub": 20,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomIndependent",
-        "env_size": "medium",
-        "input_temp": "independent_5_tasks_12_task_sets_random_graph_large_data_",
-        "lb": 20,
-        "ub": 30,
-        "method_types": ["Relaxed"]
-    },
+        "method_types": ["Strict", "StrictHeuristic", "RelaxedHeuristic", "Relaxed"]
+    }
 ]
 
 random_graph_tasks = [
     {
         "graph_type": "RandomDAG",
-        "env_size": "small",
+        "env_size": "Small",
         "input_temp": "graph_ts6_task_sets_",
         "lb": 0,
-        "ub": 30,
-        "method_types": ["Strict"]
+        "ub": 20,
+        "method_types": ["Strict", "StrictHeuristic", "RelaxedHeuristic", "Relaxed"]
     },
     {
         "graph_type": "RandomDAG",
-        "env_size": "small",
-        "input_temp": "graph_ts6_task_sets_",
-        "lb": 0,
-        "ub": 30,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomDAG",
-        "env_size": "small",
-        "input_temp": "graph_ts6_task_sets_",
-        "lb": 0,
-        "ub": 30,
-        "method_types": ["Relaxed"]
-    },
-    {
-        "graph_type": "RandomDAG",
-        "env_size": "medium",
+        "env_size": "Medium",
         "input_temp": "graph_ts12_task_sets_",
         "lb": 0,
-        "ub": 30,
-        "method_types": ["Strict"]
-    },
-    {
-        "graph_type": "RandomDAG",
-        "env_size": "medium",
-        "input_temp": "graph_ts12_task_sets_",
-        "lb": 0,
-        "ub": 30,
-        "method_types": ["StrictHeuristic", "RelaxedHeuristic"]
-    },
-    {
-        "graph_type": "RandomDAG",
-        "env_size": "medium",
-        "input_temp": "graph_ts12_task_sets_",
-        "lb": 0,
-        "ub": 30,
-        "method_types": ["Relaxed"]
+        "ub": 20,
+        "method_types": ["Strict", "StrictHeuristic", "RelaxedHeuristic", "Relaxed"]
     }
 ]
 
@@ -359,7 +71,7 @@ random_graph_tasks = [
 for task in known_graph_tasks:
     for mt in task["method_types"]:
         input_dir = "./data/Workflows/" + task["graph_type"] + "/"
-        output_dir = "./output/" + mt + "/Random/" + task["env_size"] + "/"
+        output_dir = "./output/" + task["env_size"] + "Arch/TightDeadline/" + mt + "/Random/"
         optimization(mt, input_dir, output_dir, task["env_size"], task["lb"], task["ub"], task["graph_type"], task["input_temp"])
 
 graph_sizes = ["small", "medium", "large"]
@@ -367,6 +79,6 @@ graph_sizes = ["small", "medium", "large"]
 for graph_size in graph_sizes:
     for task in random_graph_tasks:
         for mt in task["method_types"]:
-            input_dir = "./data/Workflows/RandomGraphs/" + graph_size + "Graph/"
-            output_dir = "./output/" + mt + "/Random/" + graph_size + "Graph/" + task["env_size"] + "/"
+            input_dir = ("./data/Workflows/RandomGraphs/") + graph_size + "Graph/"
+            output_dir = "./output/" + task["env_size"] + "Arch/LooseDeadline/" + mt + "/RandomDAG/" + graph_size + "Graph/"
             optimization(mt, input_dir, output_dir, task["env_size"], task["lb"], task["ub"], task["graph_type"], task["input_temp"])
