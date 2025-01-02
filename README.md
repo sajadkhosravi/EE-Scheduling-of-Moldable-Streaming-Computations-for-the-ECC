@@ -28,4 +28,5 @@ python3 ./src/main.py <METHOD> <ENV_SIZE> <INPUT_FILE> <OUTPUT_PATH>
 
 
 ## Reference
-TBA
+[S. Khosravi, C. Kessler, S. Litzinger and J. Keller, "Energy-Efficient Scheduling of Moldable Streaming Computations for the Edge-Cloud Continuum," 2024 9th International Conference on Fog and Mobile Edge Computing (FMEC), Malmö, Sweden, 2024, pp. 268-276, doi: 10.1109/FMEC62297.2024.10710310.](https://ieeexplore.ieee.org/abstract/document/10710310)
+
